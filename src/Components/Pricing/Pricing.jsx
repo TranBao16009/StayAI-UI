@@ -36,7 +36,7 @@ export default function Pricing() {
         ))}
       </div>
       
-      <h2 className="text-4xl font-bold text-center mt-16 mb-8">Đồng hành 24/7 cùng công việc quản lý nhà trọ, căn hộ của bạn</h2>
+      <h2 className="text-4xl font-bold text-center mt-16 mb-8">Đồng hành 24/7 cùng công việc quản lý cho thuê nhà trọ của bạn</h2>
       <h2 className="text-gray-500 font-bold text-center mb-8">Chúng tôi luôn cố gắng tạo ra môi trường làm việc chuyên nghiệp, sáng tạo và kỷ luật cao. Đội ngũ kỹ sư trẻ giàu nhiệt huyết và các nhân viên tư vấn khách hàng luôn sẵn sàng hỗ trợ bạn suốt 24/7, phần mềm quản lý nhà trọ luôn được phát triển hàng ngày.</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {support.map((item, index) => (

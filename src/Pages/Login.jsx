@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -22,9 +23,9 @@ const Login = () => {
         </div>
 
        
-        <button className="w-full bg-[#007370] text-white py-3 rounded-lg mt-4 hover:bg-red-600 transition">
+        <Link to='/home'><button className="w-full bg-[#007370] text-white py-3 rounded-lg mt-4 hover:bg-red-600 transition">
           Đăng nhập
-        </button>
+        </button></Link>
 
      
         <p className="text-gray-600 text-center mt-4 cursor-pointer hover:underline ">

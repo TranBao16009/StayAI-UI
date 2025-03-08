@@ -9,6 +9,7 @@ import Registers from './Pages/Registers';
 import Registerss from './Pages/Registerss';
 import Pricing from './Components/Pricing/Pricing';
 import Contact from './Components/Contact/Contact';
+import HomePage from './Components/Homepage/Homepage';
 function App() {
   return (
     
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Dashboard/>} />
           <Route path='/contact' element={<Contact/>}/>
+          <Route path='/home' element={<HomePage/>} />
           <Route path='/pricing' element={<Pricing/>} />
           <Route path='/dashboard' element={<Dashboard/>} />
           <Route path='/login' element={<Login />} />

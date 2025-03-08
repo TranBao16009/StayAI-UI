@@ -39,6 +39,12 @@
     ]
   },
   "devDependencies": {
+    "msw": "^2.7.3",
     "tailwindcss": "^3.4.17"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
