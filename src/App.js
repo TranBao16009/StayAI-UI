@@ -10,6 +10,8 @@ import Registerss from './Pages/Registerss';
 import Pricing from './Components/Pricing/Pricing';
 import Contact from './Components/Contact/Contact';
 import HomePage from './Components/Homepage/Homepage';
+import Logins from './Pages/Logins';
+import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
 function App() {
   return (
     
@@ -21,9 +23,11 @@ function App() {
           <Route path='/' element={<Dashboard/>} />
           <Route path='/contact' element={<Contact/>}/>
           <Route path='/home' element={<HomePage/>} />
+          <Route path='/privacy' element={<PrivacyPolicy/>} />
           <Route path='/pricing' element={<Pricing/>} />
           <Route path='/dashboard' element={<Dashboard/>} />
           <Route path='/login' element={<Login />} />
+          <Route path='/logins' element={<Logins />} />
           <Route path='register' element={<Register/>} />
           <Route path='registerss' element={<Registerss/>} />
           <Route path='/registers' element={<Registers />} ></Route>

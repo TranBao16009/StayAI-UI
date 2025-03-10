@@ -10,7 +10,7 @@ const HomePage = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
-  // Hàm xáo trộn mảng sử dụng thuật toán Fisher-Yates
+  
   const shuffleArray = (array) => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -21,7 +21,7 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    // Khi component mount, xáo trộn danh sách phòng và lưu vào state
+   
     fetch('/api/allRoom')
       .then((res) => res.json())
       .then((data) => setRooms(shuffleArray(data)))
@@ -29,7 +29,7 @@ const HomePage = () => {
 
   return (
     <div>
-      {/* Navbar */}
+   
       <nav className="flex justify-between items-center p-4 bg-white shadow-md">
         <div className="text-3xl font-bold text-teal-600 mr-8">Stay AI</div>
         <div className="flex space-x-6 items-center">
@@ -76,7 +76,7 @@ const HomePage = () => {
             {dropdownOpen && (
               <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
                 <Link
-                  to="/register"
+                  to="/home"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   Cá nhân
