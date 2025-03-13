@@ -49,7 +49,7 @@ const HomePage = () => {
             <span className="ml-1">•</span>Liên hệ
           </Link>
         </div>
-        {/* Dropmenu thay cho phần đăng nhập/đăng ký */}
+   
         <div className="flex items-center space-x-4 ml-auto">
           <div className="relative">
             <button
@@ -93,17 +93,17 @@ const HomePage = () => {
         </div>
       </nav>
 
-      {/* Nội dung trang chủ */}
+    
       <main className="p-8">
         <h1 className="text-4xl font-bold mb-4">Chào mừng đến với Stay AI</h1>
         <p className="text-lg mb-6">
           Dưới đây là các phòng trọ có sẵn được hiển thị ngẫu nhiên:
         </p>
 
-        {/* Hiển thị danh sách phòng theo dạng grid */}
+ 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {rooms.map((room) => {
-            // Tạo đường dẫn ảnh hợp lệ
+       
             const imageUrl = require(`../../Assets/${room.imageUrl}`);
 
             return (

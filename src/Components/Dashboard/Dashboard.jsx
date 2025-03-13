@@ -2,7 +2,7 @@ import React from 'react'
 import Hero from '../Hero/Hero';
 import Feature from '../Feature/Feature';
 import Text from '../Text/Text'
-import ManageIncome from '../ManageIncome/ManageIncome';
+
 
 
 const Dashboard = () => {
@@ -11,7 +11,7 @@ const Dashboard = () => {
       <Hero />
       <Feature />
       <Text/>
-      <ManageIncome/>
+  
    
      
      

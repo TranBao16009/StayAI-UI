@@ -12,29 +12,38 @@ import Contact from './Components/Contact/Contact';
 import HomePage from './Components/Homepage/Homepage';
 import Logins from './Pages/Logins';
 import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
+import HomePages from './Components/Homepages/Homepages';
+import ShopProvider, { ShopContext } from './Context/ShopContext';
+import ManageIncome from './Pages/ManageIncome';
+
 function App() {
   return (
     
-     <div>
-      <BrowserRouter>
-        <Navbar />
-       
-        <Routes>
-          <Route path='/' element={<Dashboard/>} />
-          <Route path='/contact' element={<Contact/>}/>
-          <Route path='/home' element={<HomePage/>} />
-          <Route path='/privacy' element={<PrivacyPolicy/>} />
-          <Route path='/pricing' element={<Pricing/>} />
-          <Route path='/dashboard' element={<Dashboard/>} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/logins' element={<Logins />} />
-          <Route path='register' element={<Register/>} />
-          <Route path='registerss' element={<Registerss/>} />
-          <Route path='/registers' element={<Registers />} ></Route>
-        </Routes>
-       </BrowserRouter>
-    </div>
    
+      <div>
+        <BrowserRouter> 
+        <ShopProvider>
+          <Navbar />
+          <Routes>
+            <Route path='/' element={<Dashboard />} />
+            <Route path='/contact' element={<Contact />} />
+            <Route path='/home' element={<HomePage />} />
+            <Route path='/homes' element={<HomePages />} />
+            <Route path='/privacy' element={<PrivacyPolicy />} />
+            <Route path='/manageincome' element={<ManageIncome/>}/>
+            <Route path='/pricing' element={<Pricing />} />
+            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/logins' element={<Logins />} />
+            <Route path='register' element={<Register />} />
+            <Route path='registerss' element={<Registerss />} />
+            <Route path='/registers' element={<Registers />} ></Route>
+          </Routes>
+          </ShopProvider>
+        </BrowserRouter>
+      </div>
+    
+
   );
 }
 
