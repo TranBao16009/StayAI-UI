@@ -1,59 +1,63 @@
-import React from "react";
+import { useState } from "react";
+import { FaRegBell, FaUserCircle, FaRegCreditCard, FaHome, FaClipboardList } from "react-icons/fa";
+import { HiOutlineUsers } from "react-icons/hi";
+import { RiLuggageCartFill } from "react-icons/ri";
 
-const ProfilePage = () => {
+const Sidebar = ({ activeTab, setActiveTab }) => {
+  const menuItems = [
+    { name: "Tổng quan", icon: <FaHome />, tab: "dashboard" },
+    { name: "Khách thuê", icon: <HiOutlineUsers />, tab: "tenants" },
+    { name: "Phòng trọ", icon: <FaClipboardList />, tab: "rooms" },
+    { name: "Thu chi", icon: <FaRegCreditCard />, tab: "finance" },
+  ];
+
   return (
-    <div className="bg-gray-100 min-h-screen">
-     
-      <nav className="bg-steal-500 p-4 text-white font-bold text-lg">
-       Stay AI
-      </nav>
-
-      <div className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
-        
-        <div className="bg-white p-4 rounded-lg shadow col-span-1">
-          <div className="flex flex-col items-center">
-            <img
-              src="https://via.placeholder.com/100"
-              alt="avatar"
-              className="rounded-full w-24 h-24 object-cover"
-            />
-            <h2 className="text-xl font-semibold mt-2">Bao Tran</h2>
-            <p className="text-gray-500 text-sm">Chưa có đánh giá</p>
-          </div>
-          <button className="mt-4 bg-[#007370] text-white px-4 py-2 rounded w-full">
-            Chia sẻ trang của bạn
-          </button>
-          <button className="mt-2 border px-4 py-2 rounded w-full">
-            Chỉnh sửa trang cá nhân
-          </button>
-          <div className="mt-4 text-sm text-gray-600">
-            <p>📅 Đã tham gia: 6 ngày</p>
-            <p>✔️ Đã xác thực</p>
-            <p>📍 Địa chỉ: Chưa cung cấp</p>
-          </div>
+    <div className="w-64 h-screen bg-gray-100 p-4 flex flex-col">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">🏠 Quản lý trọ</h2>
+      {menuItems.map((item) => (
+        <div
+          key={item.tab}
+          className={`flex items-center p-3 rounded-lg cursor-pointer transition-all hover:bg-gray-200 ${
+    activeTab === item.tab ? "bg-gray-300" : ""
+  }`}
+          onClick={() => setActiveTab(item.tab)}
+        >
+          <span className="text-lg mr-3">{item.icon}</span>
+          <span>{item.name}</span>
         </div>
+      ))}
+    </div>
+  );
+};
 
-        
-        <div className="bg-white p-4 rounded-lg shadow col-span-2">
-          <div className="border-b pb-2 flex justify-between">
-            <span className="text-orange-500 font-semibold">Đang hiển thị (0)</span>
-            <span className="text-gray-500">Đã bán (0)</span>
-          </div>
-          <div className="flex flex-col items-center mt-4 text-gray-600">
-            <img
-              src=""
-              alt="empty"
-              className="w-24"
-            />
-            <p>Bạn chưa có tin đăng nào</p>
-            <button className="mt-2 bg-[#007370] text-white px-4 py-2 rounded">
-              ĐĂNG TIN NGAY
-            </button>
-          </div>
-        </div>
+const Dashboard = () => {
+  return (
+    <div className="p-6 w-full">
+      <h2 className="text-3xl font-bold mb-4">Tổng quan</h2>
+      <div className="grid grid-cols-3 gap-4">
+        <Card title="Tin đăng" value="0 tin" desc="Đang hiển thị" />
+        <Card title="Khách thuê" value="0 người" desc="Mới hôm nay" />
+        <Card title="Số dư tài khoản" value="0 đ" desc="Tài khoản chính" />
       </div>
     </div>
   );
 };
 
-export default ProfilePage;
+const Card = ({ title, value, desc }) => (
+  <div className="bg-white p-4 shadow rounded-lg border border-gray-200">
+    <h3 className="text-xl font-semibold mb-1">{title}</h3>
+    <p className="text-2xl font-bold text-blue-600">{value}</p>
+    <p className="text-gray-500">{desc}</p>
+  </div>
+);
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="flex-1 p-6">{activeTab === "dashboard" && <Dashboard />}</div>
+    </div>
+  );
+}

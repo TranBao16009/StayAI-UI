@@ -1,10 +1,10 @@
-import image from '../Assets/phongtro1.jpg'
+// import image from '../Assets/phongtro1.jpg'
 const roomsData = [
     {
       id: 1,
       name: "Phòng trọ A",
       description: "Mô tả phòng trọ A",
-      image: "phongtro1.jpg"
+      imageUrl: "phongtro1.jpg"
     },
     {
       id: 2,

@@ -16,7 +16,8 @@ import HomePages from './Components/Homepages/Homepages';
 import ShopProvider, { ShopContext } from './Context/ShopContext';
 import ManageIncome from './Pages/ManageIncome';
 import ProfilePage from './Pages/ProfilePage';
-
+import TenantManage from './Pages/TenantManage';
+import ManageRoom from './Pages/ManageRoom';
 function App() {
   return (
     
@@ -32,6 +33,8 @@ function App() {
             <Route path='/homes' element={<HomePages />} />
             <Route path='/privacy' element={<PrivacyPolicy />} />
             <Route path='/manageincome' element={<ManageIncome/>}/>
+            <Route path='/manageroom' element={<ManageRoom/>}/>
+            <Route path='/tenantmanage' element={<TenantManage/>}/>
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/dashboard' element={<Dashboard />} />

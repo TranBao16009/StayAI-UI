@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 const Register = () => {
     return (
         <div className="flex justify-center items-center h-screen bg-[#007370]">
