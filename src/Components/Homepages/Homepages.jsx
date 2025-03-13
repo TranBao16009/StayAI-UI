@@ -41,10 +41,10 @@ const HomePages = () => {
   const handleSelect = () => {
     setDropdownOpen(false);
   };
-  
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
+
+  // const toggleDropdown = () => {
+  //   setDropdownOpen(!dropdownOpen);
+  // };
 
   const shuffleArray = (array) => {
     const newArray = [...array];
@@ -85,9 +85,9 @@ const HomePages = () => {
 
         <div className="flex items-center space-x-4 ml-auto">
           <div className="relative">
-            <button
+            <button onClick={() => setDropdownOpen(!dropdownOpen)}
               className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"
-              onClick={toggleDropdown}
+
             >Menu<svg className="w-4 h-4 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                 <path
                   stroke="currentColor"
@@ -100,10 +100,10 @@ const HomePages = () => {
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
-                <Link to="/tenantmanage" className="block px-4 py-2 hover:bg-gray-100">Quản lý khách thuê </Link>
-                <Link to="/manageroom" className="block px-4 py-2 hover:bg-gray-100">Quản lý phòng trọ</Link>
-                <Link to="/manageincome" className="block px-4 py-2 hover:bg-gray-100">Quản lý thu chi</Link>
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Hồ sơ cá nhân</Link>
+                <Link to="/tenantmanage" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý khách thuê </Link>
+                <Link to="/manageroom" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý phòng trọ</Link>
+                <Link to="/manageincome" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý thu chi</Link>
+                <Link to="/profile" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Hồ sơ cá nhân</Link>
               </div>
             )}
           </div>

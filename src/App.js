@@ -15,6 +15,7 @@ import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
 import HomePages from './Components/Homepages/Homepages';
 import ShopProvider, { ShopContext } from './Context/ShopContext';
 import ManageIncome from './Pages/ManageIncome';
+import ProfilePage from './Pages/ProfilePage';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path='/privacy' element={<PrivacyPolicy />} />
             <Route path='/manageincome' element={<ManageIncome/>}/>
             <Route path='/pricing' element={<Pricing />} />
+            <Route path='/profile' element={<ProfilePage />} />
             <Route path='/dashboard' element={<Dashboard />} />
             <Route path='/login' element={<Login />} />
             <Route path='/logins' element={<Logins />} />
