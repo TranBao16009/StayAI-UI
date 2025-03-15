@@ -18,6 +18,7 @@ import ManageIncome from './Pages/ManageIncome';
 import ProfilePage from './Pages/ProfilePage';
 import TenantManage from './Pages/TenantManage';
 import ManageRoom from './Pages/ManageRoom';
+import TermsUse from './Components/TermsUse/TermsUse';
 function App() {
   return (
     
@@ -31,6 +32,7 @@ function App() {
             <Route path='/contact' element={<Contact />} />
             <Route path='/home' element={<HomePage />} />
             <Route path='/homes' element={<HomePages />} />
+            <Route path='/use' element={<TermsUse />} />
             <Route path='/privacy' element={<PrivacyPolicy />} />
             <Route path='/manageincome' element={<ManageIncome/>}/>
             <Route path='/manageroom' element={<ManageRoom/>}/>

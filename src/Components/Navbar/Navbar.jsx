@@ -28,7 +28,7 @@ const Navbar = () => {
           <span className="flex items-center gap-1"><span>📞</span> 0707320581</span>
         </div>
         <div className="flex items-center gap-4">
-          <Link to='/' className="text-blue-600 hover:underline">Điều khoản sử dụng</Link>
+          <Link to='/use' className="text-blue-600 hover:underline">Điều khoản sử dụng</Link>
           <span className="text-gray-400">|</span>
           <Link to='/privacy' className="text-red-600 hover:underline">Chính sách bảo mật</Link>
         </div>

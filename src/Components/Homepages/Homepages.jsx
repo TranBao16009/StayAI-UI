@@ -104,6 +104,7 @@ const HomePages = () => {
                 <Link to="/manageroom" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý phòng trọ</Link>
                 <Link to="/manageincome" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý thu chi</Link>
                 <Link to="/profile" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Hồ sơ cá nhân</Link>
+                <Link to="" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Đăng xuất </Link>
               </div>
             )}
           </div>
