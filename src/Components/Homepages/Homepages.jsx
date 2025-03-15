@@ -88,7 +88,7 @@ const HomePages = () => {
             <button onClick={() => setDropdownOpen(!dropdownOpen)}
               className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"
 
-            >Menu<svg className="w-4 h-4 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            >Danh mục <svg className="w-4 h-4 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                 <path
                   stroke="currentColor"
                   strokeLinecap="round"

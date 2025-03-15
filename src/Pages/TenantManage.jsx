@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import SideBar from "../Components/SideBar/SideBar";
 const tenants = [
   { id: 1, name: "Nguyễn Văn A", phone: "0987654321", room: "101", status: "Đang thuê" },
   { id: 2, name: "Trần Thị B", phone: "0934567890", room: "102", status: "Sắp hết hạn" },
@@ -18,6 +18,8 @@ export default function TenantManage() {
   );
 
   return (
+    <>
+        <SideBar/>
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Quản lý khách thuê</h2>
       <div className="flex gap-4 mb-4">
@@ -88,5 +90,6 @@ export default function TenantManage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 
 import './App.css';
 import Navbar from './Components/Navbar/Navbar';
-import Login from './Pages/Login';
+// import Login from './Pages/Login';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Dashboard from './Components/Dashboard/Dashboard';
 import Register from './Pages/Register';
@@ -40,7 +40,7 @@ function App() {
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/login' element={<Login />} />
+            {/* <Route path='/login' element={<Login />} /> */}
             <Route path='/logins' element={<Logins />} />
             <Route path='register' element={<Register />} />
             <Route path='registerss' element={<Registerss />} />

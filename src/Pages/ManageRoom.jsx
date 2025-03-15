@@ -1,5 +1,5 @@
 import React from 'react'
-
+import SideBar from "../Components/SideBar/SideBar";
 const ManageIncome = () => {
   const transactions = [
     { id: 1, type: "Thu", amount: 2000000, description: "Tiền thuê phòng 101" },
@@ -7,6 +7,8 @@ const ManageIncome = () => {
   ];
 
   return (
+    <>
+        <SideBar/>
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Quản lý thu chi</h1>
       <table className="w-full bg-white shadow-md rounded-lg">
@@ -30,6 +32,7 @@ const ManageIncome = () => {
         </tbody>
       </table>
     </div>
+    </>
   );
 };
 

@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-import { MdOutlineFeedback } from "react-icons/md";
-import { FiMessageSquare } from "react-icons/fi";
 import { AiOutlineDashboard, AiOutlineSolution, AiOutlineSetting } from "react-icons/ai";
+import SideBar from "../Components/SideBar/SideBar";
 
 export default function ProfilePage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [selectedTab, setSelectedTab] = useState("Tổng quan");
 
     return (
+        <>
+        <SideBar/>
+
         <div className="flex h-screen bg-gray-100">
             <div className={`bg-white p-4 w-64 shadow-lg ${isSidebarOpen ? "block" : "hidden"} md:block`}>
                 <div className="flex items-center justify-between border-b pb-4">
@@ -156,5 +158,6 @@ export default function ProfilePage() {
 
           
         </div>
+        </>
     );
 }

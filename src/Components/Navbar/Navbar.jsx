@@ -3,21 +3,14 @@ import { Link } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
 
 const Navbar = () => {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const { isAuthenticated } = useContext(ShopContext);
-
-  const toggleLoginDropdown = () => {
-    setIsLoginOpen(!isLoginOpen);
-    setIsRegisterOpen(false);
-  };
-
+  const { user } = useContext(ShopContext);
   const toggleRegisterDropdown = () => {
     setIsRegisterOpen(!isRegisterOpen);
-    setIsLoginOpen(false);
+
   };
 
-  return isAuthenticated ? (
+  return user ? (
     <div></div>
   ) : (
     <div>
@@ -44,26 +37,13 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-4 ml-auto">
-          {/* Dropdown Đăng nhập */}
+
           <div className="relative">
-            <button
-              className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"
-              onClick={toggleLoginDropdown}
-            >
-              Đăng nhập
-              <svg className="w-4 h-4 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-              </svg>
-            </button>
-            {isLoginOpen && (
-              <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
-                <Link to='/login' className="block px-4 py-2 hover:bg-gray-100">Cá nhân</Link>
-                <Link to='/logins' className="block px-4 py-2 hover:bg-gray-100">Chủ hộ</Link>
-              </div>
-            )}
+           <Link to='/logins'> <button className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"  >Đăng nhập </button></Link>
+
           </div>
 
-          {/* Dropdown Đăng ký */}
+
           <div className="relative">
             <button
               className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"
@@ -87,4 +67,4 @@ const Navbar = () => {
   );
 
 };
-  export default Navbar;
+export default Navbar;

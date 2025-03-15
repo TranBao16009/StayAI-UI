@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { ShopContext } from "../Context/ShopContext";
+import { Link } from "react-router-dom";
 
 const Logins = () => {
   const { login } = useContext(ShopContext);
@@ -34,9 +35,9 @@ const Logins = () => {
         </div>
 
        
-       <button onClick={() => login(username, password)} className="w-full bg-[#007370] text-white py-3 rounded-lg mt-4 hover:bg-red-600 transition">
+       <Link to='/home'><button onClick={() => login(username, password)} className="w-full bg-[#007370] text-white py-3 rounded-lg mt-4 hover:bg-red-600 transition">
           Đăng nhập
-        </button>
+        </button></Link>
 
      
         <p className="text-gray-600 text-center mt-4 cursor-pointer hover:underline ">
