@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
+// import HomePage from "../Homepage/Homepage";
 
 const Navbar = () => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -11,6 +12,7 @@ const Navbar = () => {
   };
 
   return user ? (
+    // <HomePage></HomePage>
     <div></div>
   ) : (
     <div>
