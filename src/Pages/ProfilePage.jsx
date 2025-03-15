@@ -3,26 +3,14 @@ import { FaBars } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { MdOutlineFeedback } from "react-icons/md";
 import { FiMessageSquare } from "react-icons/fi";
-import { AiOutlineDashboard, AiOutlineUser, AiOutlineSolution, AiOutlineCreditCard, AiOutlineSetting } from "react-icons/ai";
-import { FaSearch } from "react-icons/fa";
-import { IoIosFunnel } from "react-icons/io";
-
+import { AiOutlineDashboard, AiOutlineSolution, AiOutlineSetting } from "react-icons/ai";
 
 export default function ProfilePage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [customers] = useState([
-        { id: 1, name: "Nguyễn Văn A", email: "a@example.com", phone: "0123456789" },
-        { id: 1, name: "Nguyễn Văn A", email: "a@example.com", phone: "0123456789" },
-        { id: 1, name: "Nguyễn Văn A", email: "a@example.com", phone: "0123456789" },
-        { id: 1, name: "Nguyễn Văn A", email: "a@example.com", phone: "0123456789" },
-        { id: 2, name: "Trần Thị B", email: "b@example.com", phone: "0987654321" }
-    ]);
     const [selectedTab, setSelectedTab] = useState("Tổng quan");
 
     return (
         <div className="flex h-screen bg-gray-100">
-
             <div className={`bg-white p-4 w-64 shadow-lg ${isSidebarOpen ? "block" : "hidden"} md:block`}>
                 <div className="flex items-center justify-between border-b pb-4">
                     <h2 className="text-xl font-bold">Bao Tran</h2>
@@ -30,7 +18,6 @@ export default function ProfilePage() {
                         <IoMdClose size={20} />
                     </button>
                 </div>
-
 
                 <div className="mt-4 bg-gray-50 p-4 rounded-lg shadow-md">
                     <h3 className="font-semibold">Số dư tài khoản</h3>
@@ -45,7 +32,7 @@ export default function ProfilePage() {
 
                 <div className="mt-4">
                     <ul className="space-y-2">
-                        {["Tổng quan", "Quản lý tin đăng", "Quản lý khách hàng", "Quản lý tài chính", "Hướng dẫn sử dụng", "Tiện ích"].map((tab) => (
+                        {["Tổng quan", "Quản lý tin đăng", "Tiện ích", "Thay đổi mật khẩu", "Thay đổi thông tin cá nhân"].map((tab) => (
                             <li
                                 key={tab}
                                 onClick={() => setSelectedTab(tab)}
@@ -53,18 +40,15 @@ export default function ProfilePage() {
                             >
                                 {tab === "Tổng quan" && <AiOutlineDashboard />}
                                 {tab === "Quản lý tin đăng" && <AiOutlineSolution />}
-                                {tab === "Quản lý khách hàng" && <AiOutlineUser />}
-                                {tab === "Gói Hội viên" && <AiOutlineCreditCard />}
-                                {tab === "Quản lý tài chính" && <AiOutlineCreditCard />}
-                                {tab === "Hướng dẫn sử dụng" && <AiOutlineSetting />}
                                 {tab === "Tiện ích" && <AiOutlineSetting />}
+                                {tab === "Thay đổi mật khẩu" && <AiOutlineSetting />}
+                                {tab === "Thay đổi thông tin cá nhân" && <AiOutlineSetting />}
                                 <span>{tab}</span>
                             </li>
                         ))}
                     </ul>
                 </div>
             </div>
-
 
             <div className="flex-1 p-6">
                 <button className="md:hidden mb-4" onClick={() => setIsSidebarOpen(true)}>
@@ -73,19 +57,19 @@ export default function ProfilePage() {
                 <h1 className="text-2xl font-bold">{selectedTab}</h1>
                 {selectedTab === "Tổng quan" && (
                     <div className="grid grid-cols-3 gap-4">
-                        {/* Card 1 */}
+                
                         <div className="p-4 bg-white shadow-md rounded-lg border border-gray-200">
                             <h3 className="font-semibold">Tin đăng</h3>
                             <p className="text-lg font-bold">0 tin</p>
                             <p className="text-sm text-gray-500">Đang hiển thị</p>
                         </div>
-                        {/* Card 2 */}
+              
                         <div className="p-4 bg-white shadow-md rounded-lg border border-gray-200">
                             <h3 className="font-semibold">Liên hệ trong 30 ngày</h3>
                             <p className="text-lg font-bold">0 người</p>
                             <p className="text-sm text-green-600">+0 mới vào hôm nay</p>
                         </div>
-                        {/* Card 3 */}
+
                         <div className="p-4 bg-white shadow-md rounded-lg border border-gray-200">
                             <h3 className="font-semibold">Số dư</h3>
                             <p className="text-lg font-bold">0 đ</p>
@@ -96,25 +80,24 @@ export default function ProfilePage() {
                 )}
                 {selectedTab === "Quản lý tin đăng" && (
                     <div className="grid grid-cols-3 gap-4">
-                        {/* Card 1 */}
+                       
                         <div className="p-4 bg-white shadow-md rounded-lg border border-gray-200">
                             <h3 className="font-semibold">Tin đăng</h3>
                             <p className="text-lg font-bold">0 tin</p>
                             <p className="text-sm text-gray-500">Đang hiển thị</p>
                             <button className="mt-2 text-blue-600">Đăng tin </button>
                         </div>
-                        {/* Card 2 */}
+                 
                         <div className="p-4 bg-white shadow-md rounded-lg border border-gray-200">
                             <h3 className="font-semibold">Danh sách tin </h3>
                             <p className="text-lg font-bold">0 tin</p>
                             <p className="text-sm text-green-600">Đang hiển thị</p>
                         </div>
-                        {/* Card 3 */}
+                     
                         <div className="p-4 bg-white shadow-md rounded-lg border border-gray-200">
                             <h3 className="font-semibold">Tin nháp </h3>
                             <p className="text-lg font-bold">0 tin</p>
                             <p className="text-sm text-gray-500">Đang hiển thị</p>
-
                         </div>
                     </div>
                 )}
@@ -129,71 +112,49 @@ export default function ProfilePage() {
                         </ul>
                     </div>
                 )}
-                {selectedTab === "Quản lý khách hàng" && (
-                    <div>
-                        <div className="mt-4 flex items-center space-x-4">
-                            <div className="relative flex-1">
-                                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Tìm theo tên khách hàng, SĐT hoặc email"
-                                    className="pl-10 pr-4 py-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
+                {selectedTab === "Thay đổi mật khẩu" && (
+                    <div className="mt-4 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 className="text-lg font-semibold">Thay đổi mật khẩu</h2>
+                        <form className="mt-4 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Mật khẩu hiện tại</label>
+                                <input type="password" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
                             </div>
-                            <button className="flex items-center space-x-2 px-4 py-2 border rounded-md hover:bg-gray-100">
-                                <IoIosFunnel />
-                                <span>Lọc theo nhãn</span>
-                            </button>
-                        </div>
-                        <div className="mt-6 flex space-x-6">
-                            <div className="flex-1 bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center justify-center">
-                                {customers.length === 0 ? (
-                                    <div className="text-center">
-                                        <h2 className="text-lg font-semibold mt-2">Chưa có khách hàng nào</h2>
-                                        <p className="text-gray-500">Hiện tại bạn chưa có khách hàng nào</p>
-                                    </div>
-                                ) : (
-                                    <ul>
-                                        {customers.map((customer) => (
-                                            <li
-                                                key={customer.id}
-                                                className="p-2 cursor-pointer hover:bg-gray-100"
-                                                onClick={() => setSelectedCustomer(customer)}
-                                            >
-                                                {customer.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Mật khẩu mới</label>
+                                <input type="password" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
                             </div>
-                            <div className="flex-1 bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center justify-center">
-                                {selectedCustomer ? (
-                                    <div>
-                                        <h2 className="text-lg font-semibold">{selectedCustomer.name}</h2>
-                                        <p>{selectedCustomer.email}</p>
-                                        <p>{selectedCustomer.phone}</p>
-                                    </div>
-                                ) : (
-                                    <div className="text-center">
-                                        <h2 className="text-lg font-semibold mt-2">Không có khách hàng nào được chọn</h2>
-                                        <p className="text-gray-500">Chọn một khách hàng để xem chi tiết</p>
-                                    </div>
-                                )}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu mới</label>
+                                <input type="password" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
                             </div>
-                        </div>
+                            <button type="submit" className="mt-4 bg-teal-600 text-white py-2 px-4 rounded-lg">Lưu thay đổi</button>
+                        </form>
                     </div>
                 )}
-
+                {selectedTab === "Thay đổi thông tin cá nhân" && (
+                    <div className="mt-4 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 className="text-lg font-semibold">Thay đổi thông tin cá nhân</h2>
+                        <form className="mt-4 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Họ và tên</label>
+                                <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                                <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <button type="submit" className="mt-4 bg-teal-600 text-white py-2 px-4 rounded-lg">Lưu thay đổi</button>
+                        </form>
+                    </div>
+                )}
             </div>
 
-
-            <div className="fixed right-4 bottom-16 bg-gray-800 text-white p-3 rounded-lg cursor-pointer flex items-center space-x-2 shadow-lg">
-                <MdOutlineFeedback size={20} />
-                <span>Phản hồi</span>
-            </div>
-            <div className="fixed right-4 bottom-4 bg-teal-500 text-white p-3 rounded-full shadow-lg cursor-pointer">
-                <FiMessageSquare size={24} />
-            </div>
+          
         </div>
     );
 }
