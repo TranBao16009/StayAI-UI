@@ -20,12 +20,12 @@ const Logins = () => {
             onChange={(e) => setUsername(e.target.value)}
             className="w-full h-12 px-4 border border-gray-300 rounded-lg outline-none text-gray-600"
           />
-          <input
+          {/* <input
             type="Tên tổ chức "
             placeholder="Tên tổ chức"
 
             className="w-full h-12 px-4 border border-gray-300 rounded-lg outline-none text-gray-600"
-          />
+          /> */}
           <input
             type="Mật khẩu"
             placeholder="Mật khẩu"
@@ -40,10 +40,8 @@ const Logins = () => {
         </button></Link>
 
      
-        <p className="text-gray-600 text-center mt-4 cursor-pointer hover:underline ">
-          Bạn đã có tài khoản chưa?{" "}
-         
-        </p>
+        <Link to='/register'><p className="text-gray-600 text-center mt-4 cursor-pointer hover:underline ">
+          Bạn đã có tài khoản chưa?{" "} </p></Link>
 
       </div>
     </div>

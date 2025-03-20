@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
 
-const SideBar = () => {
+const SideBars = () => {
     const { user, logout } = useContext(ShopContext);
     const handleSelect = () => {
         setDropdownOpen(false);
@@ -56,10 +56,9 @@ const SideBar = () => {
                     </button>
                     {dropdownOpen && (
                         <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
-                            <Link to="/tenantmanage" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý khách thuê </Link>
-                            <Link to="/manageroom" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý phòng trọ</Link>
-                            <Link to="/manageincome" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý thu chi</Link>
-                            <Link to="/profile" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Hồ sơ cá nhân</Link>
+                            <Link to="/contract" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý hợp đồng </Link>
+                            <Link to="/invoices" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý hóa đơn</Link>
+                            <Link to="/profiles" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Thông tin cá nhân</Link>
                             <Link to="/" onClick={logout} className="block px-4 py-2 hover:bg-gray-100">Đăng xuất </Link>
                         </div>
                     )}
@@ -68,4 +67,4 @@ const SideBar = () => {
         </nav>
     );
 };
-export default SideBar;
+export default SideBars;

@@ -5,12 +5,14 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 
-async function enanleMocking() {
+async function enanbleMocking() {
   const {worker} = await import ('../src/mocks/browser');
   return worker.start()
+ 
+  
 }
 
-enanleMocking().then(() => {
+enanbleMocking().then(() => {
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(
     <React.StrictMode>

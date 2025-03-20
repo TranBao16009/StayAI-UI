@@ -1,14 +1,12 @@
-import React, {useContext, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
-
-
 
 const HomePage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [rooms, setRooms] = useState([]);
-  const {user, logout} = useContext(ShopContext);
-  console.log("Day la user:" + user);
+  const { user, logout } = useContext(ShopContext);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -16,8 +14,15 @@ const HomePage = () => {
   const handleSelect = () => {
     setDropdownOpen(false);
   };
+  const handleGoToHomes = () => {
+    if (user && user.role === "owner") {
+      navigate("/homes");
+    } else {
+      alert("Bạn không phải là chủ hộ. Vui lòng đăng ký hoặc đăng nhập.");
+      navigate("/login"); // Điều hướng đến trang đăng nhập
+    }
+  };
 
-  
   const shuffleArray = (array) => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -28,7 +33,6 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-   
     fetch('/api/allRoom')
       .then((res) => res.json())
       .then((data) => setRooms(shuffleArray(data)))
@@ -43,9 +47,6 @@ const HomePage = () => {
           <Link to="/" className="hover:underline flex items-center">
             <span className="ml-1">•</span>Trang chủ
           </Link>
-          <Link to="/rooms" className="hover:underline flex items-center">
-            <span className="ml-1">•</span>Phòng trọ
-          </Link>
           <Link to="/pricing" className="hover:underline flex items-center">
             <span className="ml-1">•</span>Bảng giá
           </Link>
@@ -56,53 +57,48 @@ const HomePage = () => {
             <span className="ml-1">•</span>Liên hệ
           </Link>
         </div>
-   
+
         <div className="flex items-center space-x-4 ml-auto">
-          <p className=" text-black rounded flex text-xl items-center "> Stay AI Xin Chào, {user ? user.username : ""} ! </p>
+          <p className="text-black text-xl">Stay AI Xin Chào, {user ? user.username : ""}!</p>
+
+          <button
+            onClick={handleGoToHomes}
+            className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition"
+          >
+            Chủ hộ
+          </button>
+
           <div className="relative">
             <button
               className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"
               onClick={toggleDropdown}
-            > Danh mục <svg
-                className="w-4 h-4 ml-2"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 1 4 4 4-4"
-                />
+            >
+              Danh mục
+              <svg className="w-4 h-4 ml-2" viewBox="0 0 10 6">
+                <path stroke="currentColor" strokeWidth="2" d="m1 1 4 4 4-4" />
               </svg>
             </button>
+
             {dropdownOpen && (
-               <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
-                              <Link to="/tenantmanage" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý khách thuê </Link>
-                              <Link to="/manageroom" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý phòng trọ</Link>
-                              <Link to="/manageincome" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý thu chi</Link>
-                              <Link to="/profile" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Hồ sơ cá nhân</Link>
-                              <Link to="/" onClick={logout} className="block px-4 py-2 hover:bg-gray-100">Đăng xuất </Link>
-                            </div>
+              <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
+                <Link to="/contract" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý hợp đồng</Link>
+                <Link to="/invoices" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý hóa đơn</Link>
+                <Link to="/profiles" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Thông tin cá nhân</Link>
+                <Link to="/" onClick={logout} className="block px-4 py-2 hover:bg-gray-100">Đăng xuất</Link>
+              </div>
             )}
           </div>
         </div>
       </nav>
 
-    
       <main className="p-8">
         <h1 className="text-4xl font-bold mb-4">Chào mừng đến với Stay AI</h1>
         <p className="text-lg mb-6">
           Dưới đây là các phòng trọ có sẵn được hiển thị ngẫu nhiên:
         </p>
 
- 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {rooms.map((room) => {
-       
             const imageUrl = require(`../../Assets/${room.imageUrl}`);
 
             return (
@@ -118,7 +114,6 @@ const HomePage = () => {
             );
           })}
         </div>
-
       </main>
     </div>
   );

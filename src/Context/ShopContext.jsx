@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // dùng để chuyển hướng trang
+import { useNavigate } from "react-router-dom";
 
 export const ShopContext = createContext();
 
@@ -7,7 +7,7 @@ const ShopProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-  const navigate = useNavigate(); // Hook điều hướng
+  const navigate = useNavigate(); 
 
   useEffect(()=>{
     const savedUsers = localStorage.getItem("user");
@@ -16,7 +16,7 @@ const ShopProvider = ({ children }) => {
     }
   }, []);
 
-  // Hàm đăng nhập (giả định)
+
   const login = (username, password) => {
     if (username === "admin" && password === "123") {
       setIsAuthenticated(true);
@@ -24,21 +24,21 @@ const ShopProvider = ({ children }) => {
         "username": username
       }));
       setUser(localStorage.getItem("user"));
-      navigate("/homes"); // Chuyển đến trang Home sau khi đăng nhập
+      navigate("/homes"); 
      
     } 
   };
+  
 
-  // Hàm đăng xuất
   const logout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("user");
     setUser(null);
     console("Redirect to login");
-    navigate("/logins"); // Quay về trang Login
+    navigate("/logins"); 
   };
 
-  // Hàm thêm sản phẩm vào giỏ hàng
+
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
