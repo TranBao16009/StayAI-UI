@@ -22,6 +22,7 @@ import TermsUse from './Components/TermsUse/TermsUse';
 import ManageInvoices from './Components/ManageInvoices/ManageInvoices';
 import ContractManage from './Components/ContractManagement/ContractManagement';
 import Profile from './Pages/Profile';
+import NewsPage from './Components/NewPage/NewPage';
 function App() {
   return (
     
@@ -43,6 +44,7 @@ function App() {
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/profiles' element={<Profile />} />
+            <Route path='/news' element={<NewsPage />} />
             <Route path='/contract' element={<ContractManage/>} />
             <Route path='/invoices' element={<ManageInvoices />} />
             <Route path='/dashboard' element={<Dashboard />} />

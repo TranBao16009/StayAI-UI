@@ -8,13 +8,13 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const handleLogin = () => {
-    // Giả sử kiểm tra thông tin đăng nhập
+
     if (email === "" || organization === "" || password === "") {
       setError("Vui lòng điền đầy đủ thông tin.");
     } else {
-      // Xử lý đăng nhập
+
       setError("");
-      // Điều hướng đến trang homes
+
       window.location.href = "/homes";
     }
   };

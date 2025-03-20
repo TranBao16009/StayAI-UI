@@ -5,33 +5,59 @@ import { ShopContext } from "../../Context/ShopContext";
 const roomsData = [
   {
     id: 1,
-    name: "Phòng trọ A",
-    description: "Mô tả phòng trọ A",
-    imageUrl: "https://via.placeholder.com/300x200?text=Phòng+trọ+A"
+    name: "Phòng trọ quận 7, nhiều cơ sở từ 2tr8",
+    description: "Nguyễn Thị Thập, Phường Tân Quy, Quận 7, TPHCM",
+    city: "TPHCM",
+    price: 2800000,
+    imageUrl: require("../../Assets/tro1.jpg"),
   },
   {
     id: 2,
-    name: "Phòng trọ B",
-    description: "Mô tả phòng trọ B",
-    imageUrl: "https://via.placeholder.com/300x200?text=Phòng+trọ+B"
+    name: "Phòng Studio Mới Toanh ngay Chung Cư LACASA Q.7",
+    description: "Hoàng Quốc Việt, Phường Phú Thuận, Quận 7, TPHCM",
+    city: "TPHCM",
+    price: 3500000,
+    imageUrl: require("../../Assets/tro2.webp"),
   },
   {
     id: 3,
-    name: "Phòng trọ C",
-    description: "Mô tả phòng trọ C",
-    imageUrl: "https://via.placeholder.com/300x200?text=Phòng+trọ+C"
+    name: "💥 Phòng Mới Xây Full Tiện Nghi-ngay khu K300",
+    description: "Nguyễn Thái Bình, Phường 12, Quận Tân Bình, TPHCM",
+    city: "TPHCM",
+    price: 4000000,
+    imageUrl: require("../../Assets/tro3.webp"),
   },
   {
     id: 4,
-    name: "Phòng trọ D",
-    description: "Mô tả phòng trọ D",
-    imageUrl: "https://via.placeholder.com/300x200?text=Phòng+trọ+D"
+    name: "Phòng Gác Lửng Thoáng Mát — 5p đi AEON Mall Tân Phú",
+    description: "Độc Lập, Phường Tân Quý, Quận Tân Phú, TPHCM",
+    city: "TPHCM",
+    price: 3000000,
+    imageUrl: require("../../Assets/tro4.jpg"),
   },
   {
     id: 5,
-    name: "Phòng trọ E",
-    description: "Mô tả phòng trọ E",
-    imageUrl: "https://via.placeholder.com/300x200?text=Phòng+trọ+E"
+    name: "🌿Phòng Đẹp Đón Nắng Ngay Cầu Vượt Nguyễn Tri Phương",
+    description: "Đường 3 Tháng 2, Phường 14, Quận 10, TPHCM",
+    city: "TPHCM",
+    price: 3200000,
+    imageUrl: require("../../Assets/tro5.webp"),
+  },
+  {
+    id: 6,
+    name: "🍀Hé Lộ Siêu Phẩm Căn Hộ Sang Trọng Lý Chính Thắng... 🍀🍀",
+    description: "Lý Chính Thắng, Phường 7, Quận 3, TPHCM",
+    city: "TPHCM",
+    price: 3200000,
+    imageUrl: require("../../Assets/tro6.jpg"),
+  },
+  {
+    id: 7,
+    name: "Phòng trọ mới xây gần Đại học Quốc gia",
+    description: "Đường Linh Trung, Phường Linh Trung, Quận Thủ Đức, TPHCM",
+    city: "TPHCM",
+    price: 2500000,
+    imageUrl: require("../../Assets/tro7.jpg"),
   }
 ];
 

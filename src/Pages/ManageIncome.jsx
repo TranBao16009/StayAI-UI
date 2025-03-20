@@ -72,7 +72,7 @@ export default function ExpenseManagement() {
       <div className="p-6 space-y-6">
         <h1 className="text-2xl font-bold">Quản lý thu chi</h1>
 
-        {/* Tổng kết thu chi */}
+
         <Card>
           <CardContent>
             <h2 className="text-xl font-semibold mb-4">Tổng kết</h2>
@@ -83,7 +83,6 @@ export default function ExpenseManagement() {
           </CardContent>
         </Card>
 
-        {/* Biểu đồ thu chi */}
         <Card className="mt-8">
           <CardContent>
             <h2 className="text-xl font-semibold mb-4">Biểu đồ tài chính</h2>
@@ -100,7 +99,7 @@ export default function ExpenseManagement() {
           </CardContent>
         </Card>
 
-        {/* Bảng thu chi */}
+    
         <Card>
           <CardContent>
             <h2 className="text-xl font-semibold mb-4">Danh sách giao dịch</h2>
@@ -132,7 +131,6 @@ export default function ExpenseManagement() {
           </CardContent>
         </Card>
 
-        {/* Form thêm giao dịch */}
         <Card>
           <CardContent>
             <h2 className="text-xl font-semibold mb-4">{editingTransaction ? "Cập nhật giao dịch" : "Thêm giao dịch mới"}</h2>
