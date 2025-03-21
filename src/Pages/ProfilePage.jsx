@@ -3,6 +3,7 @@ import { FaBars } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { AiOutlineDashboard, AiOutlineSolution, AiOutlineSetting } from "react-icons/ai";
 import SideBar from "../Components/SideBar/SideBar";
+import { Link } from "react-router-dom";
 
 export default function ProfilePage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -87,7 +88,7 @@ export default function ProfilePage() {
                             <h3 className="font-semibold">Tin đăng</h3>
                             <p className="text-lg font-bold">0 tin</p>
                             <p className="text-sm text-gray-500">Đang hiển thị</p>
-                            <button className="mt-2 text-blue-600">Đăng tin </button>
+                            <Link to='/postnew'><button className="mt-2 text-blue-600">Đăng tin </button></Link>
                         </div>
                  
                         <div className="p-4 bg-white shadow-md rounded-lg border border-gray-200">

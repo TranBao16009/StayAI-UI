@@ -98,9 +98,9 @@ const HomePages = () => {
           <Link to="/" className="hover:underline flex items-center">
             <span className="ml-1">•</span>Trang chủ
           </Link>
-          <Link to="/rooms" className="hover:underline flex items-center">
+          {/* <Link to="/rooms" className="hover:underline flex items-center">
             <span className="ml-1">•</span>Phòng trọ
-          </Link>
+          </Link> */}
           <Link to="/pricing" className="hover:underline flex items-center">
             <span className="ml-1">•</span>Bảng giá
           </Link>
@@ -127,6 +127,7 @@ const HomePages = () => {
     {dropdownOpen && (
       <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
         <Link to="/tenantmanage" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý khách thuê </Link>
+        <Link to="/contracts" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý hợp đồng </Link>
         <Link to="/manageroom" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý phòng trọ</Link>
         <Link to="/manageincome" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý thu chi</Link>
         <Link to="/profile" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Hồ sơ cá nhân</Link>

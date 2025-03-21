@@ -23,6 +23,8 @@ import ManageInvoices from './Components/ManageInvoices/ManageInvoices';
 import ContractManage from './Components/ContractManagement/ContractManagement';
 import Profile from './Pages/Profile';
 import NewsPage from './Components/NewPage/NewPage';
+import Contract from './Components/Contract/Contract';
+import PostNews from './Components/PostNews/PostNews';
 function App() {
   return (
     
@@ -37,12 +39,14 @@ function App() {
             <Route path='/home' element={<HomePage />} />
             <Route path='/homes' element={<HomePages />} />
             <Route path='/use' element={<TermsUse />} />
+            <Route path='/postnew' element={<PostNews />} />
             <Route path='/privacy' element={<PrivacyPolicy />} />
             <Route path='/manageincome' element={<ManageIncome/>}/>
             <Route path='/manageroom' element={<ManageRoom/>}/>
             <Route path='/tenantmanage' element={<TenantManage/>}/>
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/profile' element={<ProfilePage />} />
+            <Route path='/contracts' element={<Contract />} />
             <Route path='/profiles' element={<Profile />} />
             <Route path='/news' element={<NewsPage />} />
             <Route path='/contract' element={<ContractManage/>} />
