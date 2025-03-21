@@ -20,12 +20,12 @@ const Text = () => {
                 <div className="p-6 bg-white rounded-lg shadow-md">
                     <img src="icon3.png" alt="" className="mx-auto mb-4" />
                     <h3 className="font-bold text-xl">Phù hợp nhiều mô hình</h3>
-                    <p className="mt-2">Chúng tôi nghiên cứu thiết kế phần mềm phù hợp với nhiều mô hình nhà trọ, chung cư mini, căn hộ dịch vụ.</p>
+                    <p className="mt-2">Chúng tôi nghiên cứu thiết kế phần mềm phù hợp với nhiều mô hình nhà trọ.</p>
                 </div>
                 <div className="p-6 bg-white rounded-lg shadow-md">
                     <img src="icon4.png" alt="" className="mx-auto mb-4" />
                     <h3 className="font-bold text-xl">Tiết kiệm chi phí tối đa</h3>
-                    <p className="mt-2">Chỉ với 12.000 đồng/phòng, chủ trọ đã có thể áp dụng công nghệ tiên tiến vào quản lý nhà trọ, căn hộ của mình.</p>
+                    <p className="mt-2">Chỉ với 12.000 đồng/phòng, chủ trọ đã có thể áp dụng công nghệ tiên tiến vào quản lý nhà trọ của mình.</p>
                 </div>
             </div>
             
