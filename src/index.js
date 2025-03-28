@@ -6,10 +6,17 @@ import reportWebVitals from './reportWebVitals';
 
 
 async function enanbleMocking() {
-  const {worker} = await import ('../src/mocks/browser');
+
+  console.log('Mocking:' + process.env.REACT_APP_USE_MOCK_BACKEND);
+  if (process.env.REACT_APP_USE_MOCK_BACKEND === 'false') {
+    console.log('mocking is disabled');
+    return;
+  }
+
+  const { worker } = await import('../src/mocks/browser');
+  console.log('worker started');
   return worker.start()
- 
-  
+
 }
 
 enanbleMocking().then(() => {
