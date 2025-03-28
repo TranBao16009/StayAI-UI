@@ -26,10 +26,10 @@ export default function ProfilePage() {
                     <h3 className="font-semibold">Số dư tài khoản</h3>
                     <p>TK Chính: <span className="font-bold">0</span></p>
                     <p>TK Khuyến mãi: <span className="font-bold">0</span></p>
-                    <div className="mt-2 flex items-center justify-between bg-gray-200 p-2 rounded-lg">
+                    {/* <div className="mt-2 flex items-center justify-between bg-gray-200 p-2 rounded-lg">
                         <p className="text-sm">Mã chuyển khoản</p>
                         <span className="font-bold">BDS42750026</span>
-                    </div>
+                    </div> */}
                     <button className="mt-4 bg-teal-600 text-white py-2 px-4 w-full rounded-lg">Nạp tiền</button>
                 </div>
 

@@ -57,7 +57,7 @@ const ManageInvoices = () => {
               <th className="border p-3">Tháng</th>
               <th className="border p-3">Số Tiền</th>
               <th className="border p-3">Trạng Thái</th>
-              <th className="border p-3">Hành Động</th>
+              {/* <th className="border p-3">Hành Động</th> */}
             </tr>
           </thead>
           <tbody>
@@ -72,12 +72,7 @@ const ManageInvoices = () => {
                       Thanh toán
                     </button>
                   )}
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
-                    <FaDownload />
-                  </button>
-                  <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition">
-                    <FaInfoCircle />
-                  </button>
+                
                 </td>
               </tr>
             ))}

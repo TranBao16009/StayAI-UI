@@ -1,6 +1,7 @@
 import React, { useState, useEffect,useContext } from "react";
 import { Link } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
+import { fetchData } from "../../api";
 
 const roomsData = [
   {
@@ -85,8 +86,9 @@ const HomePages = () => {
   };
 
   useEffect(() => {
-
-    setRooms(shuffleArray(roomsData));
+    fetchData('/api/allRoom')
+      .then((res) => res.json())
+      .then((data) => setRooms(data));
   }, []);
 
   return (

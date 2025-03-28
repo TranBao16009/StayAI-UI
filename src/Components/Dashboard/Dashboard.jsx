@@ -5,12 +5,14 @@ import Text from '../Text/Text'
 
 
 
+
 const Dashboard = () => {
   return (
     <div>
       <Hero />
       <Feature />
       <Text/>
+  
   
    
      

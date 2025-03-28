@@ -23,8 +23,10 @@ import ManageInvoices from './Components/ManageInvoices/ManageInvoices';
 import ContractManage from './Components/ContractManagement/ContractManagement';
 import Profile from './Pages/Profile';
 import NewsPage from './Components/NewPage/NewPage';
-import Contract from './Components/Contract/Contract';
+// import Contract from './Components/Contract/Contract';
 import PostNews from './Components/PostNews/PostNews';
+import RoomDetail from './Components/RoomDetail/RoomDetail';
+import CancelContract from './Components/CancelContract/CancelContract';
 function App() {
   return (
     
@@ -46,14 +48,16 @@ function App() {
             <Route path='/tenantmanage' element={<TenantManage/>}/>
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/profile' element={<ProfilePage />} />
-            <Route path='/contracts' element={<Contract />} />
+            {/* <Route path='/contracts' element={<Contract />} /> */}
             <Route path='/profiles' element={<Profile />} />
             <Route path='/news' element={<NewsPage />} />
+            <Route path='/room/:roomID' element={<RoomDetail />} />
             <Route path='/contract' element={<ContractManage/>} />
             <Route path='/invoices' element={<ManageInvoices />} />
             <Route path='/dashboard' element={<Dashboard />} />
             <Route path='/login' element={<Login />} />
             <Route path='/logins' element={<Logins />} />
+            <Route path='/cancel' element={<CancelContract />} />
             <Route path='register' element={<Register />} />
             <Route path='registerss' element={<Registerss />} />
             <Route path='/registers' element={<Registers />} ></Route>

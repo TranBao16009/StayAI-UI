@@ -56,8 +56,8 @@ const SideBar = () => {
                     </button>
                     {dropdownOpen && (
                         <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
-                            <Link to="/tenantmanage" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý khách thuê </Link>
-                            <Link to="/contracts" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý hợp đồng </Link>
+                            {/* <Link to="/tenantmanage" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý khách thuê </Link> */}
+                            <Link to="/tenantmanage" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý hợp đồng và khách thuê </Link>
                             <Link to="/manageroom" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý phòng trọ</Link>
                             <Link to="/manageincome" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Quản lý thu chi</Link>
                             <Link to="/profile" onClick={handleSelect} className="block px-4 py-2 hover:bg-gray-100">Hồ sơ cá nhân</Link>
