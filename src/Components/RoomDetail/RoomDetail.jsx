@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchData } from "../../api";
-import UploadImage from "../UploadImage/UploadImage"; // Import UploadImage
+import { getRoomById } from "../../Assets/library"; // Kiểm tra đường dẫn chính xác
 
 const DEFAULT_IMAGE = "https://via.placeholder.com/600x400?text=No+Image";
 
@@ -11,34 +10,20 @@ const RoomDetail = () => {
   const [mainImage, setMainImage] = useState(DEFAULT_IMAGE);
 
   useEffect(() => {
-    fetchData(`/api/room/${roomID}`)
-      .then((data) => {
-        if (!data || Object.keys(data).length === 0) {
-          throw new Error("Phòng không tồn tại.");
-        }
-        setRoom(data);
-        setMainImage(data.images?.[0] || DEFAULT_IMAGE);
-      })
-      .catch((error) => {
-        console.error("Lỗi khi tải dữ liệu phòng:", error);
-      });
+    const roomData = getRoomById(Number(roomID)); // Chuyển roomID thành số
+    if (!roomData) {
+      console.error("Phòng không tồn tại.");
+      return;
+    }
+    setRoom(roomData);
+    setMainImage(roomData.images?.[0] || DEFAULT_IMAGE);
   }, [roomID]);
-
-  const handleImageUpload = (newImageUrl) => {
-    setRoom((prevRoom) => ({
-      ...prevRoom,
-      images: [...(prevRoom?.images || []), newImageUrl],
-    }));
-    setMainImage(newImageUrl);
-  };
 
   if (!room) return <p className="text-center text-lg">Đang tải thông tin phòng...</p>;
 
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold">{room.title}</h1>
-
-      {/* Hình ảnh */}
       <div>
         <img src={mainImage} alt="Phòng trọ" className="w-full h-96 object-cover rounded-lg shadow-md" />
         <div className="flex mt-2 space-x-2">
@@ -53,9 +38,6 @@ const RoomDetail = () => {
           ))}
         </div>
       </div>
-
-      {/* Tải ảnh lên */}
-      <UploadImage onUpload={handleImageUpload} />
     </div>
   );
 };

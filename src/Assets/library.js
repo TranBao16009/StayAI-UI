@@ -61,7 +61,11 @@ const roomsData = [
       owner: { name: "Chị Hằng", phone: "0987 654 321" },
     },
   ];
-  export {roomsData};
-  export {roomsID};
+  export const getRoomById = (id) => {
+    return roomsID.find((room) => room.id == id); 
+  };
+  
+  export { roomsData, roomsID};
+
  
   

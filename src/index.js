@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 
-async function enanbleMocking() {
+async function enableMocking() {
 
   console.log('Mocking:' + process.env.REACT_APP_USE_MOCK_BACKEND);
   if (process.env.REACT_APP_USE_MOCK_BACKEND === 'false') {
@@ -13,13 +13,13 @@ async function enanbleMocking() {
     return;
   }
 
-  const { worker } = await import('../src/mocks/browser');
+  const { worker } = await import('./mocks/browser');
   console.log('worker started');
   return worker.start()
 
 }
 
-enanbleMocking().then(() => {
+enableMocking().then(() => {
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(
     <React.StrictMode>

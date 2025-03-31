@@ -7,17 +7,31 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
-
+  const handleLogin = async () => {
     if (email === "" || organization === "" || password === "") {
       setError("Vui lòng điền đầy đủ thông tin.");
-    } else {
-
-      setError("");
-
-      window.location.href = "/homes";
+      return;
+    }
+  
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, organization, password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setError("");
+        window.location.href = "/homes";
+      } else {
+        setError("Sai thông tin đăng nhập");
+      }
+    } catch (err) {
+      console.error("Lỗi đăng nhập:", err);
+      setError("Có lỗi xảy ra khi đăng nhập.");
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#007370]">

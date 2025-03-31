@@ -1,5 +1,6 @@
 import { useState } from "react";
 import SideBar from "../Components/SideBar/SideBar";
+import ConfirmDialog from "../Components/Dialog/Dialog";
 
 export default function TenantManage() {
   const [contracts, setContracts] = useState([
@@ -7,7 +8,7 @@ export default function TenantManage() {
     { id: 2, room: "102", tenantName: "Trần Thị B", tenantPhone: "0934567890", startDate: "2023-06-01", endDate: "2024-06-01", rent: "3.500.000", status: "Sắp hết hạn" },
   ]);
   const [search, setSearch] = useState("");
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [ setShowAddForm] = useState(false);
   const [newContract, setNewContract] = useState({
     room: "",
     tenantName: "",
@@ -18,6 +19,8 @@ export default function TenantManage() {
     status: "Đang hiệu lực",
   });
   const [editingContract, setEditingContract] = useState(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [contractToDelete, setContractToDelete] = useState(null);
 
   const filteredContracts = contracts.filter((contract) =>
     contract.tenantName.toLowerCase().includes(search.toLowerCase())
@@ -33,9 +36,15 @@ export default function TenantManage() {
     setNewContract({ room: "", tenantName: "", tenantPhone: "", startDate: "", endDate: "", rent: "", status: "Đang hiệu lực" });
   };
 
-  const handleDeleteContract = (id) => {
-    const updatedContracts = contracts.filter((contract) => contract.id !== id);
-    setContracts(updatedContracts);
+  const confirmDelete = (contract) => {
+    setContractToDelete(contract);
+    setShowDialog(true);
+  };
+
+  const handleDeleteConfirmed = () => {
+    setContracts(contracts.filter((c) => c.id !== contractToDelete.id));
+    setShowDialog(false);
+    setContractToDelete(null);
   };
 
   const handleSaveContract = (updatedContract) => {
@@ -53,7 +62,6 @@ export default function TenantManage() {
         <h2 className="text-3xl font-bold mb-4">Quản lý hợp đồng và khách thuê</h2>
         <hr className="mb-6 border-gray-300" />
 
-        {/* Thanh tìm kiếm */}
         <div className="relative max-w-md mb-6">
           <input
             type="text"
@@ -64,7 +72,6 @@ export default function TenantManage() {
           />
         </div>
 
-        {/* Bảng hợp đồng */}
         <table className="w-full border rounded-lg">
           <thead className="bg-gray-200">
             <tr>
@@ -89,8 +96,7 @@ export default function TenantManage() {
                 <td className="p-2">{contract.rent}</td>
                 <td className="p-2">
                   <span
-                    className={`px-2 py-1 text-white text-sm rounded ${contract.status === "Đang hiệu lực" ? "bg-green-500" : "bg-yellow-500"
-                      }`}
+                    className={`px-2 py-1 text-white text-sm rounded ${contract.status === "Đang hiệu lực" ? "bg-green-500" : "bg-yellow-500"}`}
                   >
                     {contract.status}
                   </span>
@@ -104,7 +110,7 @@ export default function TenantManage() {
                   </button>
                   <button
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    onClick={() => handleDeleteContract(contract.id)}
+                    onClick={() => confirmDelete(contract)}
                   >
                     Xóa
                   </button>
@@ -113,6 +119,7 @@ export default function TenantManage() {
             ))}
           </tbody>
         </table>
+
         <div className="mt-4">
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -122,139 +129,13 @@ export default function TenantManage() {
           </button>
         </div>
 
-        {/* Form thêm hợp đồng */}
-        {showAddForm && (
-          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full">
-              <h3 className="text-xl font-bold mb-4">Thêm Hợp Đồng</h3>
-              <input
-                type="text"
-                placeholder="Số phòng"
-                className="border p-2 rounded w-full mb-2"
-                value={newContract.room}
-                onChange={(e) => setNewContract({ ...newContract, room: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Tên khách hàng"
-                className="border p-2 rounded w-full mb-2"
-                value={newContract.tenantName}
-                onChange={(e) => setNewContract({ ...newContract, tenantName: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Số điện thoại"
-                className="border p-2 rounded w-full mb-2"
-                value={newContract.tenantPhone}
-                onChange={(e) => setNewContract({ ...newContract, tenantPhone: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Giá thuê"
-                className="border p-2 rounded w-full mb-2"
-                value={newContract.rent}
-                onChange={(e) => setNewContract({ ...newContract, rent: e.target.value })}
-              />
-              <input
-                type="date"
-                className="border p-2 rounded w-full mb-2"
-                value={newContract.startDate}
-                onChange={(e) => setNewContract({ ...newContract, startDate: e.target.value })}
-              />
-              <input
-                type="date"
-                className="border p-2 rounded w-full mb-2"
-                value={newContract.endDate}
-                onChange={(e) => setNewContract({ ...newContract, endDate: e.target.value })}
-              />
-              <button
-                className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
-                onClick={handleAddContract}
-              >
-                Lưu
-              </button>
-              <button
-                className="mt-4 ml-2 bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => setShowAddForm(false)}
-              >
-                Hủy
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Form chỉnh sửa hợp đồng */}
-        {editingContract && (
-          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full">
-              <h3 className="text-xl font-bold mb-4">Chỉnh sửa Hợp Đồng</h3>
-              <input
-                type="text"
-                placeholder="Số phòng"
-                className="border p-2 rounded w-full mb-2"
-                value={editingContract.room}
-                onChange={(e) =>
-                  setEditingContract({ ...editingContract, room: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="Tên khách hàng"
-                className="border p-2 rounded w-full mb-2"
-                value={editingContract.tenantName}
-                onChange={(e) =>
-                  setEditingContract({ ...editingContract, tenantName: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="Số điện thoại"
-                className="border p-2 rounded w-full mb-2"
-                value={editingContract.tenantPhone}
-                onChange={(e) =>
-                  setEditingContract({ ...editingContract, tenantPhone: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="Giá thuê"
-                className="border p-2 rounded w-full mb-2"
-                value={editingContract.rent}
-                onChange={(e) =>
-                  setEditingContract({ ...editingContract, rent: e.target.value })
-                }
-              />
-              <input
-                type="date"
-                className="border p-2 rounded w-full mb-2"
-                value={editingContract.startDate}
-                onChange={(e) =>
-                  setEditingContract({ ...editingContract, startDate: e.target.value })
-                }
-              />
-              <input
-                type="date"
-                className="border p-2 rounded w-full mb-2"
-                value={editingContract.endDate}
-                onChange={(e) =>
-                  setEditingContract({ ...editingContract, endDate: e.target.value })
-                }
-              />
-              <button
-                className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
-                onClick={() => handleSaveContract(editingContract)}
-              >
-                Lưu
-              </button>
-              <button
-                className="mt-4 ml-2 bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => setEditingContract(null)}
-              >
-                Hủy
-              </button>
-            </div>
-          </div>
-        )}
+        <ConfirmDialog
+          show={showDialog}
+          title="Xác nhận xoá hợp đồng"
+          message={`Bạn có chắc muốn xoá hợp đồng của ${contractToDelete?.tenantName}?`}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setShowDialog(false)}
+        />
       </div>
     </>
   );

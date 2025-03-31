@@ -1,14 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SideBars from "../SideBars/SideBars";
-import {  FaSearch, FaDownload, FaInfoCircle } from "react-icons/fa";
-
+import { FaSearch } from "react-icons/fa";
+import ConfirmDialog from "../Dialog/Dialog";
 const ManageInvoices = () => {
-  const [contracts] = useState([
-    { id: 1, room: "Tháng 2/2024", amount: "3.000.000 VND", status: "Chưa thanh toán" },
-    { id: 2, room: "Tháng 1/2024", amount: "3.000.000 VND", status: "Đã thanh toán" },
-  ]);
+  const [invoices, setInvoices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [invoiceToPay, setInvoiceToPay] = useState(null); 
+  useEffect(() => {
+    fetchInvoices();
+  }, []);
+
+  const fetchInvoices = async () => {
+    try {
+      const res = await fetch('/api/invoices');
+      const data = await res.json();
+      setInvoices(data);
+    } catch (err) {
+      console.error("Lỗi tải hóa đơn:", err);
+    }
+  };
+
+  const handlePay = async (id) => {
+    try {
+      const res = await fetch(`/api/invoices/${id}/pay`, { method: 'POST' });
+      const updated = await res.json();
+      setInvoices(invoices.map(inv => inv.id === id ? updated : inv));
+      setShowConfirm(false);
+    } catch (err) {
+      console.error("Lỗi thanh toán:", err);
+    }
+  };
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -18,8 +41,8 @@ const ManageInvoices = () => {
     }
   };
 
-  const filteredContracts = contracts.filter(contract =>
-    contract.room.toLowerCase().includes(searchTerm.toLowerCase()) &&
+  const filteredContracts = invoices.filter(contract =>
+    contract.month.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (filterStatus === "" || contract.status === filterStatus)
   );
 
@@ -28,7 +51,7 @@ const ManageInvoices = () => {
       <SideBars />
       <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Quản Lý Hóa Đơn</h2>
-        
+
         <div className="mb-4 flex justify-between items-center">
           <div className="relative w-1/3">
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
@@ -50,35 +73,47 @@ const ManageInvoices = () => {
             <option value="Chưa thanh toán">Chưa thanh toán</option>
           </select>
         </div>
-        
+
         <table className="w-full border-collapse border border-gray-300 shadow-md rounded-lg">
           <thead>
             <tr className="bg-gray-200 text-gray-700 text-left">
               <th className="border p-3">Tháng</th>
               <th className="border p-3">Số Tiền</th>
               <th className="border p-3">Trạng Thái</th>
-              {/* <th className="border p-3">Hành Động</th> */}
+              <th className="border p-3">Hành Động</th>
             </tr>
           </thead>
           <tbody>
-            {filteredContracts.map((contract) => (
-              <tr key={contract.id} className="text-center bg-white hover:bg-gray-100 transition">
-                <td className="border p-3">{contract.room}</td>
-                <td className="border p-3">{contract.amount}</td>
-                <td className={`border p-3 ${getStatusStyle(contract.status)}`}>{contract.status}</td>
+            {filteredContracts.map((invoice) => (
+              <tr key={invoice.id} className="text-center bg-white hover:bg-gray-100 transition">
+                <td className="border p-3">{invoice.month}</td>
+                <td className="border p-3">{invoice.amount.toLocaleString()} đ</td>
+                <td className={`border p-3 ${getStatusStyle(invoice.status)}`}>{invoice.status}</td>
                 <td className="border p-3 flex justify-center gap-2">
-                  {contract.status === "Chưa thanh toán" && (
-                    <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
+                  {invoice.status === "Chưa thanh toán" && (
+                    <button
+                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                      onClick={() => {
+                        setInvoiceToPay(invoice);       
+                        setShowConfirm("pay");          
+                      }}
+                    >
                       Thanh toán
                     </button>
                   )}
-                
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <ConfirmDialog
+        show={showConfirm === "pay"}
+        title="Xác nhận thanh toán"
+        message="Hành động này không thể hoàn tác. Bạn có chắc chắn muốn thanh toán?"
+        onConfirm={() => handlePay(invoiceToPay.id)} 
+        onCancel={() => setShowConfirm(false)}
+      />
     </>
   );
 };

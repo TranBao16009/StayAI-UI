@@ -9,41 +9,65 @@ const ShopProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate(); 
 
-  useEffect(()=>{
-    const savedUsers = localStorage.getItem("user");
-    if(savedUsers){
-      setUser(JSON.parse(savedUsers));
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      setIsAuthenticated(true);
     }
   }, []);
-
-
-  const login = (username, password) => {
-    if (username === "admin" && password === "123") {
-      setIsAuthenticated(true);
-      localStorage.setItem("user", JSON.stringify({
-        "username": username
-      }));
-      setUser(localStorage.getItem("user"));
-      navigate("/homes"); 
-     
-    } 
-  };
   
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("user");
-    setUser(null);
-    console("Redirect to login");
-    navigate("/logins"); 
+
+  const authorization = async (username, role) => {
+    try {
+      // const res = await fetch('/api/login', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ username, password })
+      // });
+  
+      // const data = await res.json();
+      // if (data.success) {
+      //   const userInfo = { username: username, role: data.role || "user" };
+      //   localStorage.setItem("user", JSON.stringify(userInfo));
+      //   setUser(userInfo);
+      //   setIsAuthenticated(true);
+      //   navigate("/homes");s
+      // } else {
+      //   alert("Sai thông tin đăng nhập");
+      // }
+      const userInfo = { username: username, role: role || "user" };
+      localStorage.setItem("user", JSON.stringify(userInfo));
+      setUser(userInfo);
+      setIsAuthenticated(true);
+      if (role === "owner") {
+        navigate("/homes");
+      }
+      else {
+        navigate("/home");
+      }
+    } catch (err) {
+      console.error("Lỗi đăng nhập:", err);
+    }
   };
+  
+  
+
+const logout = () => {
+  setIsAuthenticated(false);
+  localStorage.removeItem("user");
+  setUser(null);
+  navigate("/logins");
+};
+
 
 
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
-  const contextValue = { cart, addToCart, isAuthenticated, login, logout, user, setUser };
+  const contextValue = { cart, addToCart, isAuthenticated, authorization, logout, user, setUser };
 
   return (
     <ShopContext.Provider value={contextValue}>

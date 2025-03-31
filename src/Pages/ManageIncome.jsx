@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import SideBar from "../Components/SideBar/SideBar";
+import ConfirmDialog from "../Components/Dialog/Dialog";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Card = ({ children }) => <div className="border rounded-lg shadow p-4">{children}</div>;
 const CardContent = ({ children }) => <div>{children}</div>;
 const Button = ({ children, className, ...props }) => (
-    <button className={`px-4 py-2 bg-blue-500 text-white rounded ${className}`} {...props}>
-      {children}
-    </button>
+  <button className={`px-4 py-2 bg-blue-500 text-white rounded ${className}`} {...props}>
+    {children}
+  </button>
 );
 const Input = (props) => <input className="border rounded px-2 py-1 w-full" {...props} />;
 const Table = ({ children }) => <table className="w-full border">{children}</table>;
@@ -37,6 +38,8 @@ export default function ExpenseManagement() {
   });
 
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -59,8 +62,15 @@ export default function ExpenseManagement() {
     setNewTransaction({ date: "", type: "Thu", amount: "", note: "" });
   };
 
-  const handleDeleteTransaction = (id) => {
-    setTransactions(transactions.filter(transaction => transaction.id !== id));
+  const confirmDelete = (transaction) => {
+    setTransactionToDelete(transaction);
+    setShowDialog(true);
+  };
+
+  const handleDeleteConfirmed = () => {
+    setTransactions(transactions.filter(t => t.id !== transactionToDelete.id));
+    setShowDialog(false);
+    setTransactionToDelete(null);
   };
 
   const totalIncome = transactions.filter(t => t.type === "Thu").reduce((acc, t) => acc + t.amount, 0);
@@ -71,7 +81,6 @@ export default function ExpenseManagement() {
       <SideBar />
       <div className="p-6 space-y-6">
         <h1 className="text-2xl font-bold">Quản lý thu chi</h1>
-
 
         <Card>
           <CardContent>
@@ -99,7 +108,6 @@ export default function ExpenseManagement() {
           </CardContent>
         </Card>
 
-    
         <Card>
           <CardContent>
             <h2 className="text-xl font-semibold mb-4">Danh sách giao dịch</h2>
@@ -122,7 +130,7 @@ export default function ExpenseManagement() {
                     <TableCell>{t.note}</TableCell>
                     <TableCell>
                       <Button className="bg-yellow-500 mr-2" onClick={() => handleEditTransaction(t)}>Sửa</Button>
-                      <Button className="bg-red-500" onClick={() => handleDeleteTransaction(t.id)}>Xóa</Button>
+                      <Button className="bg-red-500" onClick={() => confirmDelete(t)}>Xóa</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -173,6 +181,14 @@ export default function ExpenseManagement() {
             </div>
           </CardContent>
         </Card>
+
+        <ConfirmDialog
+          show={showDialog}
+          title="Xác nhận xoá giao dịch"
+          message={`Bạn có chắc muốn xoá giao dịch ngày ${transactionToDelete?.date}?`}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setShowDialog(false)}
+        />
       </div>
     </>
   );

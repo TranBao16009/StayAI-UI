@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
 // import HomePage from "../Homepage/Homepage";
@@ -10,6 +10,11 @@ const Navbar = () => {
     setIsRegisterOpen(!isRegisterOpen);
 
   };
+
+  useEffect(() => {
+    //console.log("User:", user);
+    // console.log("Is Authenticated:", isAuthenticated);
+  })
 
   return user ? (
     // <HomePage></HomePage>
@@ -32,7 +37,12 @@ const Navbar = () => {
       <nav className="flex justify-between items-center p-4 bg-white shadow-md">
         <div className="text-3xl font-bold text-teal-600 mr-8">Stay AI</div>
         <div className="flex space-x-6 items-center">
-          <Link to="/" className="hover:underline flex items-center"><span className="ml-1">•</span>Trang chủ</Link>
+         
+            <Link to="/" className="hover:underline flex items-center">
+              <span className="ml-1">•</span>Trang chủ
+            </Link>
+          
+
           <Link to="/pricing" className="hover:underline flex items-center"><span className="ml-1">•</span>Bảng giá</Link>
           <Link to="/news" className="hover:underline flex items-center"><span className="ml-1">•</span>Tin tức</Link>
           <Link to="/contact" className="hover:underline flex items-center"><span className="ml-1">•</span>Liên hệ</Link>
@@ -41,7 +51,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-4 ml-auto">
 
           <div className="relative">
-           <Link to='/logins'> <button className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"  >Đăng nhập </button></Link>
+            <Link to='/logins'> <button className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center"  >Đăng nhập </button></Link>
 
           </div>
 
@@ -58,10 +68,11 @@ const Navbar = () => {
             </button>
             {isRegisterOpen && (
               <div className="absolute right-0 bg-white shadow-md rounded mt-2 py-2 w-40">
-                <Link to='/register' className="block px-4 py-2 hover:bg-gray-100">Cá nhân</Link>
-                <Link to='/registers' className="block px-4 py-2 hover:bg-gray-100">Chủ hộ</Link>
+                <Link to='/register' className="block px-4 py-2 hover:bg-gray-100" onClick={toggleRegisterDropdown}>Cá nhân</Link>
+                <Link to='/registers' className="block px-4 py-2 hover:bg-gray-100" onClick={toggleRegisterDropdown}>Chủ hộ</Link>
               </div>
             )}
+
           </div>
         </div>
       </nav>

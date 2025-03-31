@@ -27,6 +27,8 @@ import NewsPage from './Components/NewPage/NewPage';
 import PostNews from './Components/PostNews/PostNews';
 import RoomDetail from './Components/RoomDetail/RoomDetail';
 import CancelContract from './Components/CancelContract/CancelContract';
+import Dialog from './Components/Dialog/Dialog';
+import SideBar from './Components/SideBar/SideBar';
 function App() {
   return (
     
@@ -35,7 +37,10 @@ function App() {
         <BrowserRouter> 
         <ShopProvider>
           <Navbar />
+          {/* <SideBars /> */}
+
           <Routes>
+            <Route path='/Sidebar' element={<SideBar />} />
             <Route path='/' element={<Dashboard />} />
             <Route path='/contact' element={<Contact />} />
             <Route path='/home' element={<HomePage />} />
@@ -60,6 +65,7 @@ function App() {
             <Route path='/cancel' element={<CancelContract />} />
             <Route path='register' element={<Register />} />
             <Route path='registerss' element={<Registerss />} />
+            <Route path='/dialog' element={<Dialog />} />
             <Route path='/registers' element={<Registers />} ></Route>
           </Routes>
           </ShopProvider>

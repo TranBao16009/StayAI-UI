@@ -3,9 +3,28 @@ import { ShopContext } from "../Context/ShopContext";
 import { Link } from "react-router-dom";
 
 const Logins = () => {
-  const { login } = useContext(ShopContext);
+  const { authorization } = useContext(ShopContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  
+  const handleLogin = async () => {
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        authorization(username, data.user.role); // gọi hàm context nếu cần
+      } else {
+        alert("Đăng nhập thất bại");
+      }
+    } catch (err) {
+      console.error("Lỗi đăng nhập:", err);
+    }
+  };
+  
   return (
     
     <div className="flex items-center justify-center min-h-screen bg-[#007370]">
@@ -35,7 +54,7 @@ const Logins = () => {
         </div>
 
        
-       <Link to='/home'><button onClick={() => login(username, password)} className="w-full bg-[#007370] text-white py-3 rounded-lg mt-4 hover:bg-red-600 transition">
+       <Link to='/home'><button onClick={handleLogin} className="w-full bg-[#007370] text-white py-3 rounded-lg mt-4 hover:bg-red-600 transition">
           Đăng nhập
         </button></Link>
 
