@@ -14,7 +14,6 @@ const IndexCounterDetail = ({ roomId, roomPrices }) => {
     };
     fetchIndexCounter();
   }, [roomId]);
-
   const handlePayment = async (roomId, totalAmount, paymentId) => {
     try {
       const orderInfo = `${roomId}AND${paymentId}`; // Thông tin đơn hàng
@@ -56,6 +55,7 @@ const IndexCounterDetail = ({ roomId, roomPrices }) => {
                 </th>
                 <th className="border p-3 text-center">Dùng internet (vnđ)</th>
                 <th className="border p-3 text-center">Dùng truyền hình cap (vnđ)</th>
+                <th className="border p-3 text-center">Tiền phòng (vnđ)</th>
                 <th className="border p-3 text-center">Thành tiền (vnđ)</th>
                 <th className="border p-3 text-center">Trạng thái</th>
                 <th className="border p-3 text-center w-[150px]">Hành động</th> {/* Cột hành động */}
@@ -64,10 +64,11 @@ const IndexCounterDetail = ({ roomId, roomPrices }) => {
             <tbody>
               {counter?.map((el) => {
                 const totalAmount =
+                  roomPrices.price +
                   el.electric * roomPrices?.electricPrice +
                   el.water * roomPrices?.waterPrice +
                   (el.internet ? 1 : 0) * roomPrices?.internetPrice +
-                  (el.caps ? 1 : 0) * roomPrices?.capsPrice;
+(el.caps ? 1 : 0) * roomPrices?.capsPrice;
 
                 return (
                   <tr key={el.id}>
@@ -80,6 +81,7 @@ const IndexCounterDetail = ({ roomId, roomPrices }) => {
                     <td className="border p-3 text-center">
                       {el.caps ? formatMoney(roomPrices?.capsPrice) : 0}
                     </td>
+                    <td className="border p-3 text-center">{formatMoney(roomPrices.price)}</td>
                     <td className="border p-3 text-center">{formatMoney(totalAmount)}</td>
                     <td className="border p-3 text-center">
                       {el.isPayment ? "Đã thanh toán" : "Chưa thanh toán"}

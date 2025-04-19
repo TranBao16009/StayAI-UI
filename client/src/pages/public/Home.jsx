@@ -1,51 +1,56 @@
-import { useState } from "react";
-import { FaComments } from "react-icons/fa"; // Biểu tượng chat
+import { useEffect, useRef, useState } from "react";
+import { FaComments } from "react-icons/fa";
 import { HomeSection } from "~/components/posts";
 import { useAppStore } from "~/store";
-import axios from "axios"; // Axios để gửi yêu cầu HTTP
+import { apiSuggestPost } from "~/apis/post";
+import { Link } from "react-router-dom";
+import pathname from "~/utilities/path"
+import slugify from "slugify"
 
 const Home = () => {
   const { catalogs } = useAppStore();
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [messages, setMessages] = useState([]); // Lưu trữ các tin nhắn
-  const [userMessage, setUserMessage] = useState(""); // Tin nhắn người dùng
+  const [messages, setMessages] = useState([]);
+  const [userMessage, setUserMessage] = useState("");
+  const [suggestedPosts, setSuggestedPosts] = useState([]);
+  const inputRef = useRef(null);
 
-  // Hàm xử lý gửi tin nhắn và gọi API GPT
   const handleSendMessage = async () => {
     if (userMessage.trim()) {
       const newMessage = { sender: "user", text: userMessage };
       setMessages((prev) => [...prev, newMessage]);
-      setUserMessage(""); // Xóa tin nhắn sau khi gửi
+      setUserMessage("");
+      setSuggestedPosts([]);
 
       try {
-        // Gọi API GPT để lấy phản hồi
-        const aiResponse = await axios.post(
-          "https://api.openai.com/v1/chat/completions",
-          {
-            model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: userMessage }],
-            max_tokens: 800,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer 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`, // Thay bằng API Key của bạn
-            },
-          }
-        );
-
-        // Lấy kết quả từ GPT và thêm vào chatbox
-        const aiMessage = aiResponse.data.choices[0].message.content;
+        const res = await apiSuggestPost({ message: userMessage });
+        const aiMessage = res?.suggestion || "Không có gợi ý phù hợp.";
         const botMessage = { sender: "bot", text: aiMessage };
-        setMessages((prev) => [...prev, botMessage]); // Cập nhật tin nhắn từ người dùng và chatbot
+        setMessages((prev) => [...prev, botMessage]);
+        setSuggestedPosts(res?.suggestedPosts || []);
       } catch (error) {
-        console.error("Error sending message to GPT", error);
+        console.error("Lỗi khi gọi API gợi ý:", error);
         setMessages((prev) => [
           ...prev,
           { sender: "bot", text: "Đã có lỗi xảy ra. Vui lòng thử lại!" },
         ]);
       }
     }
+  };
+
+  useEffect(() => {
+    if (isChatOpen && inputRef.current) inputRef.current.focus();
+  }, [messages, isChatOpen]);
+
+  const convertMarkdownToHTML = (markdown) => {
+    let html = markdown.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/__(.*?)__/g, "<strong>$1</strong>");
+    html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+    html = html.replace(/_(.*?)_/g, "<em>$1</em>");
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-500 underline" target="_blank" rel="noopener noreferrer">$1</a>');
+    html = html.replace(/^- (.*)$/gm, "<li>• $1</li>");
+    html = html.replace(/\n/g, "<br />");
+    return html;
   };
 
   return (
@@ -59,61 +64,93 @@ const Home = () => {
       <HomeSection filters={{ sort: "-star" }} title="Tin đăng nổi bật" />
       <HomeSection filters={{ sort: "-createdAt" }} title="Tin đăng mới nhất" />
 
-      {/* Icon Box Chat */}
+      {/* Nút mở chatbot */}
       <div
         onClick={() => setIsChatOpen(!isChatOpen)}
-        className="fixed bottom-10 right-10 bg-blue-500 text-white p-4 rounded-full cursor-pointer shadow-lg"
+        className="fixed bottom-10 right-10 bg-blue-500 text-white p-4 rounded-full cursor-pointer shadow-lg z-50"
       >
         <FaComments size={24} />
       </div>
 
       {/* Chat Box */}
       {isChatOpen && (
-        <div className="fixed bottom-16 right-10 w-[350px] h-[450px] bg-white shadow-lg rounded-lg p-4">
-          <div className="h-full flex flex-col">
-            {/* Header */}
-            <div className="flex items-center mb-4">
-              <img
-                src="https://i.pinimg.com/originals/21/a1/aa/21a1aa2537400d0232efd93e108fd953.gif" // Thay thế với ảnh avatar chatbot của bạn
-                alt="StayAI Chat"
-                className="w-14 h-14 rounded-full mr-2"
-              />
-              <span className="text-lg font-semibold">StayAI Chat</span>
-            </div>
+        <div className="fixed bottom-16 right-10 w-[500px] h-[600px] bg-white shadow-2xl rounded-xl p-4 border border-gray-300 z-50 flex flex-col">
+          <div className="flex items-center mb-3">
+            <img
+              src="https://i.pinimg.com/originals/21/a1/aa/21a1aa2537400d0232efd93e108fd953.gif"
+              alt="StayAI Chat"
+              className="w-14 h-14 rounded-full mr-3"
+            />
+            <span className="text-xl font-bold text-gray-700">StayAI Chat</span>
+          </div>
 
-            {/* Tin nhắn */}
-            <div className="flex-1 overflow-y-auto mb-4">
-              {messages.map((msg, index) => (
+          {/* Tin nhắn */}
+          <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`text-sm ${msg.sender === "user" ? "text-right" : "text-left"}`}
+              >
                 <div
-                  key={index}
-                  className={`mb-2 ${msg.sender === "user" ? "text-right" : "text-left"}`}
+                  className={`inline-block max-w-[80%] px-4 py-2 rounded-lg shadow-sm ${msg.sender === "user"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-800"}`}
                 >
                   <div
-                    className={`inline-block max-w-[70%] px-3 py-2 rounded-md ${msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-200"
-                      }`}
-                  >
-                    {msg.text}
-                  </div>
+                    dangerouslySetInnerHTML={{
+                      __html: convertMarkdownToHTML(msg.text),
+                    }}
+                  />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
 
-            {/* Input */}
-            <div className="flex items-center mt-auto">
-              <input
-                type="text"
-                value={userMessage}
-                onChange={(e) => setUserMessage(e.target.value)}
-                className="flex-1 p-2 border border-gray-300 rounded-md"
-                placeholder="Nhập tin nhắn..."
-              />
-              <button
-                onClick={handleSendMessage}
-                className="ml-2 p-2 bg-blue-500 text-white rounded-md"
-              >
-                Gửi
-              </button>
-            </div>
+            {/* Gợi ý bài đăng */}
+            {suggestedPosts.length > 0 && (
+              <div className="mt-3 space-y-3">
+                {suggestedPosts.map((post, i) => (
+                  <div
+                    key={post.id}
+                    className="border border-gray-300 rounded-lg p-3 bg-gray-50"
+                  >
+                    <Link
+                      to={`/${pathname.public.DETAIL_POST}/${post.id}/${slugify(post.title).toLocaleLowerCase()}`}
+                      className="font-semibold cursor-pointer hover:underline text-lg text-[#007370] line-clamp-3"
+                    >
+                      {post.title}
+                    </Link>
+                    <div className="text-sm text-gray-500 mb-1">
+                      {post.address}
+                    </div>
+                    <div className="text-sm text-gray-700 mb-1">
+                      <strong>Giá:</strong> {post.rRooms.map((r) => r.price).join(", ")} VND
+                    </div>
+                    <div className="text-sm text-yellow-500 mb-1">
+                      ⭐ {post.star || "Chưa có"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Input */}
+          <div className="flex items-center pt-3 mt-auto border-t border-gray-200">
+            <input
+              ref={inputRef}
+              type="text"
+              value={userMessage}
+              onChange={(e) => setUserMessage(e.target.value)}
+              className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Nhập tin nhắn..."
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+            />
+            <button
+              onClick={handleSendMessage}
+              className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+            >
+              Gửi
+            </button>
           </div>
         </div>
       )}

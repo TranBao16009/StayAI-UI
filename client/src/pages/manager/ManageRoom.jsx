@@ -136,7 +136,7 @@ const ManageRoom = () => {
               id="keyword"
               register={register}
               errors={errors}
-              placeholder="Tìm kiếm theo tựa đề, địa chỉ"
+              placeholder="Tìm kiếm theo tựa đề"
               containerClassName="w-fit"
               inputClassName="px-8 focus:px-4"
             />

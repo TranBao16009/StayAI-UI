@@ -13,6 +13,8 @@ const {
   arrayReq,
   array,
 } = require("../middlewares/schema.middleware")
+router.post("/suggested", ctrls.getSuggestedPosts)
+
 router.post(
   "/new",
   verifyToken,

@@ -53,7 +53,7 @@ const ManagerDashboard = () => {
               id="keyword"
               register={register}
               errors={errors}
-              placeholder="Username, SĐT, tên, ..."
+              placeholder="Username, tên, ..."
               containerClassName="w-fit"
               inputClassName="px-8 focus:px-4"
             />

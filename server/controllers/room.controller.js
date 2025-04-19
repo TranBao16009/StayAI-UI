@@ -4,46 +4,60 @@ const { Sequelize, Op } = require("sequelize")
 
 module.exports = {
   getRooms: asyncHandler(async (req, res) => {
-    const { limit, page, sort, fields, title, keyword, postedBy, isDeleted, ...filters } = req.query
-    const options = {}
-    if (postedBy) filters["$rPost.postedBy$"] = +postedBy
+    const { limit, page, sort, fields, title, keyword, postedBy, isDeleted, ...filters } = req.query;
+    const options = {};
+    const roomWhere = { ...filters };
+
+    if (postedBy) roomWhere["$rPost.postedBy$"] = +postedBy;
+
     if (fields) {
-      const attributes = fields.split(",")
-      const isExclude = attributes.some((el) => el.startsWith("-"))
-      if (isExclude)
-        options.attributes = {
-          exclude: attributes.map((el) => el.replace("-", "")),
-        }
-      else options.attributes = attributes
+      const attributes = fields.split(",");
+      const isExclude = attributes.some((el) => el.startsWith("-"));
+      options.attributes = isExclude
+        ? { exclude: attributes.map((el) => el.replace("-", "")) }
+        : attributes;
     }
-    if (!isDeleted) filters.isDeleted = false
-    if (keyword)
-      filters[Op.or] = [
+
+    if (!isDeleted) roomWhere.isDeleted = false;
+
+    // ✅ Tìm kiếm theo Room
+    if (keyword) {
+      roomWhere[Op.or] = [
         {
-          title: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rPost.title")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
+          title: {
+            [Op.iLike]: `%${keyword}%`,
+          },
+        },
+        {
+          position: Sequelize.where(
+            Sequelize.cast(Sequelize.col("Room.position"), "TEXT"),
+            {
+              [Op.iLike]: `%${keyword}%`,
+            }
           ),
         },
         {
-          address: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rPost.address")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
+          internetPrice: Sequelize.where(
+            Sequelize.cast(Sequelize.col("Room.internetPrice"), "TEXT"),
+            {
+              [Op.iLike]: `%${keyword}%`,
+            }
           ),
         },
-      ]
+      ];
+    }
+
     if (sort) {
       const order = sort
         .split(",")
-        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]))
-      options.order = order
+        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]));
+      options.order = order;
     }
 
+    // Không phân trang
     if (!limit) {
       const response = await db.Room.findAll({
-        where: filters,
+        where: roomWhere,
         subQuery: false,
         include: [
           {
@@ -54,21 +68,25 @@ module.exports = {
         ],
         ...options,
         distinct: true,
-      })
+      });
+
       return res.json({
         success: response.length > 0,
-        mes: response.length > 0 ? "Got." : "Có lỗi, hãy thử lại sau.",
+        mes: response.length > 0 ? "Got." : "Không tìm thấy phòng.",
         rooms: response,
-      })
+      });
     }
-    const prevPage = !page || page === 1 ? 0 : page - 1
-    const offset = prevPage * limit
-    if (offset) options.offset = offset
-    options.limit = +limit
+
+    // Có phân trang
+    const prevPage = !page || page === 1 ? 0 : page - 1;
+    const offset = prevPage * limit;
+    if (offset) options.offset = offset;
+    options.limit = +limit;
+
     const response = await db.Room.findAndCountAll({
-      where: filters,
-      // subQuery: false,
+      where: roomWhere,
       ...options,
+      distinct: true,
       include: [
         {
           model: db.Post,
@@ -105,9 +123,7 @@ module.exports = {
           ],
         },
       ],
-
-      distinct: true,
-    })
+    });
 
     return res.json({
       success: Boolean(response),
@@ -115,8 +131,9 @@ module.exports = {
       rooms: response,
       options,
       filters,
-    })
+    });
   }),
+
   update: asyncHandler(async (req, res) => {
     const { roomId } = req.params
     const response = await db.Room.update(req.body, { where: { id: roomId } })
@@ -136,7 +153,7 @@ module.exports = {
         {
           where: {
             roomId: roomId,
-            userId : userId,
+            userId: userId,
             status: "Đang chờ"
           },
         }
@@ -187,116 +204,156 @@ module.exports = {
     })
   }),
   getAdminRooms: asyncHandler(async (req, res) => {
-    const { limit, page, sort, fields, title, keyword, isDeleted, ...filters } = req.query
-    const options = {}
-    if (fields) {
-      const attributes = fields.split(",")
-      const isExclude = attributes.some((el) => el.startsWith("-"))
-      if (isExclude)
-        options.attributes = {
-          exclude: attributes.map((el) => el.replace("-", "")),
-        }
-      else options.attributes = attributes
-    }
-    if (!isDeleted) filters.isDeleted = false
-    if (keyword)
-      filters[Op.or] = [
-        {
-          title: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rPost.title")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-        {
-          address: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rPost.address")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-      ]
-    if (sort) {
-      const order = sort
-        .split(",")
-        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]))
-      options.order = order
-    }
+    try {
+      const { limit, page, sort, fields, title, keyword, isDeleted, ...filters } = req.query;
+      const options = {};
 
-    if (!limit) {
-      const response = await db.Room.findAll({
+      // Xử lý chọn trường (fields)
+      if (fields) {
+        const attributes = fields.split(",");
+        const isExclude = attributes.some((el) => el.startsWith("-"));
+        if (isExclude) {
+          options.attributes = {
+            exclude: attributes.map((el) => el.replace("-", "")),
+          };
+        } else {
+          options.attributes = attributes;
+        }
+      }
+
+      // Lọc isDeleted mặc định false nếu không truyền
+      if (!isDeleted) {
+        filters.isDeleted = false;
+      }
+
+      // Xử lý tìm kiếm keyword trên bảng Room
+      if (keyword) {
+        filters[Op.or] = [
+          {
+            title: {
+              [Op.iLike]: `%${keyword}%`,
+            },
+          },
+          {
+            position: Sequelize.where(
+              Sequelize.cast(Sequelize.col("position"), "TEXT"),
+              {
+                [Op.iLike]: `%${keyword}%`,
+              }
+            ),
+          },
+          {
+            internetPrice: Sequelize.where(
+              Sequelize.cast(Sequelize.col("internetPrice"), "TEXT"),
+              {
+                [Op.iLike]: `%${keyword}%`,
+              }
+            ),
+          },
+        ];
+      }
+
+      // Xử lý sắp xếp
+      if (sort) {
+        const order = sort
+          .split(",")
+          .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]));
+        options.order = order;
+      }
+
+      // Trường hợp không phân trang
+      if (!limit) {
+        const response = await db.Room.findAll({
+          where: filters,
+          subQuery: false,
+          include: [
+            {
+              model: db.Post,
+              as: "rPost",
+              attributes: ["id", "postedBy", "title"],
+            },
+          ],
+          ...options,
+          distinct: true,
+        });
+
+        return res.json({
+          success: response.length > 0,
+          mes: response.length > 0 ? "Got." : "Không tìm thấy phòng.",
+          rooms: response,
+        });
+      }
+
+      // Trường hợp có phân trang
+      const prevPage = !page || page === 1 ? 0 : page - 1;
+      const offset = prevPage * limit;
+      if (offset) options.offset = offset;
+      options.limit = +limit;
+
+      const response = await db.Room.findAndCountAll({
         where: filters,
-        subQuery: false,
+        ...options,
+        distinct: true,
         include: [
           {
             model: db.Post,
             as: "rPost",
             attributes: ["id", "postedBy", "title"],
+            required: true,
+          },
+          {
+            model: db.Payment,
+            as: "rPayment",
+            include: [
+              {
+                model: db.User,
+                attributes: ["phone"],
+                as: "rUser",
+              },
+            ],
+          },
+          {
+            model: db.IndexCounter,
+            as: "rCounter",
+          },
+          {
+            model: db.Contract,
+            as: "rContract",
+            attributes: ["id"],
+            include: [
+              {
+                model: db.User,
+                as: "rUser",
+                attributes: ["id"],
+                include: [
+                  {
+                    model: db.Profile,
+                    as: "rprofile",
+                    attributes: ["firstName", "lastName"],
+                  },
+                ],
+              },
+            ],
           },
         ],
-        ...options,
-        distinct: true,
-      })
+      });
+
       return res.json({
-        success: response.length > 0,
-        mes: response.length > 0 ? "Got." : "Có lỗi, hãy thử lại sau.",
+        success: true,
+        mes: "Got.",
         rooms: response,
-      })
+        options,
+        filters,
+      });
+    } catch (error) {
+      console.error("getAdminRooms error:", error);
+      return res.status(500).json({
+        success: false,
+        mes: "Đã xảy ra lỗi khi truy vấn danh sách phòng.",
+        error: error.message,
+      });
     }
-    const prevPage = !page || page === 1 ? 0 : page - 1
-    const offset = prevPage * limit
-    if (offset) options.offset = offset
-    options.limit = +limit
-    const response = await db.Room.findAndCountAll({
-      where: filters,
-      // subQuery: false,
-      ...options,
-      include: [
-        {
-          model: db.Post,
-          as: "rPost",
-          attributes: ["id", "postedBy", "title"],
-          required: true,
-        },
-        {
-          model: db.Payment,
-          as: "rPayment",
-          include: [{ model: db.User, attributes: ["phone"], as: "rUser" }],
-        },
-        {
-          model: db.IndexCounter,
-          as: "rCounter",
-        },
-        {
-          model: db.Contract,
-          as: "rContract",
-          attributes: ["id"],
-          include: [
-            {
-              model: db.User,
-              as: "rUser",
-              attributes: ["id"],
-              include: [
-                {
-                  model: db.Profile,
-                  as: "rprofile",
-                  attributes: ["firstName", "lastName"],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-
-      distinct: true,
-    })
-
-    return res.json({
-      success: Boolean(response),
-      mes: response ? "Got." : "Có lỗi, hãy thử lại sau.",
-      rooms: response,
-      options,
-      filters,
-    })
   }),
+
+
 }

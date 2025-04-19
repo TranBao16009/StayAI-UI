@@ -1,8 +1,99 @@
 const asyncHandler = require("express-async-handler")
 const db = require("../models")
 const { Sequelize, Op } = require("sequelize")
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+require("dotenv").config();
+
+const ai = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY);
+
+// Khởi tạo đúng model
+const model = ai.getGenerativeModel({ model: "gemini-2.0-flash-001" });
 
 module.exports = {
+  getSuggestedPosts: asyncHandler(async (req, res) => {
+    const { message } = req.body;
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        mes: "Missing input message",
+      });
+    }
+
+    // Lấy danh sách bài viết từ DB
+    const posts = await db.Post.findAll({
+      where: { isDeleted: false },
+      attributes: ["id", "title", "address", "description", "star", "images"],
+      include: [
+        { model: db.Catalog, as: "rCatalog", attributes: ["value"] },
+        { model: db.Room, as: "rRooms", attributes: ["price", "area"] },
+      ],
+      limit: 10,
+    });
+
+    // Format để đưa vào prompt AI
+    const formattedPosts = posts.map((p, i) => {
+      const priceList = p.rRooms.map((r) => r.price).join(", ");
+      return `${i + 1}. ${p.title} (${p.rCatalog?.value}) - ${p.address}. Giá: ${priceList} VND. Sao: ${p.star || "N/A"}.\nMô tả: ${p.description}`;
+    });
+
+    const prompt = `
+    Bạn là một trợ lý ảo chuyên gợi ý bài đăng thuê trọ cho người dùng, giọng điệu thân thiện, đáng tin cậy.
+    
+    Nhiệm vụ:
+    1. Phân tích nội dung câu hỏi của người dùng.
+    2. Nếu câu hỏi **liên quan đến nhu cầu thuê phòng trọ**, hãy:
+       - Chọn **1 bài đăng phù hợp nhất** từ danh sách dưới (đánh số từ 1 đến 10).
+       - Trả lời theo mẫu: "Tôi gợi ý bài số X vì ..."
+    
+    3. Nếu câu hỏi **không liên quan đến việc thuê phòng**, chỉ cần lịch sự trả lời: 
+       "Tôi là chatbot hỗ trợ tìm phòng trọ. Bạn có thể cho tôi biết khu vực, mức giá, hoặc yêu cầu cụ thể để tôi giúp bạn nhé!"
+    - Trò chuyện tự nhiên
+    - Phản hồi ngắn gọn, súc tích, dễ hiểu
+    - Ưu tiên gợi ý phòng phù hợp (nếu có)
+4.Nếu người dùng **chưa nói rõ nhu cầu** (không có từ khóa như vị trí, giá, tiện ích):
+→ Hãy gợi ý nhẹ nhàng:
+"Bạn vui lòng cho mình biết:
+- Khu vực muốn thuê (VD: Hà Đông, Thanh Xuân)
+- Ngân sách dự kiến
+- Yêu cầu đặc biệt nếu có (VD: gần trường, có điều hòa)"
+Nếu đã đủ thông tin → gợi ý bài đăng phù hợp.
+
+    Câu hỏi người dùng: "${message}"
+    
+    Danh sách bài đăng:
+    ${formattedPosts.map((item, idx) => `${idx + 1}. ${item}`).join("\n\n")}
+    `.trim();
+
+
+    try {
+      const result = await model.generateContent(prompt);
+      const suggestion = await result.response.text();
+
+      // Tìm các chỉ số bài đăng AI đề xuất (1-based index)
+      const suggestedIndexes = [...suggestion.matchAll(/\b(\d{1,2})\b/g)]
+        .map((m) => Number(m[1]) - 1)
+        .filter((i) => i >= 0 && i < posts.length);
+
+      const uniqueIndexes = [...new Set(suggestedIndexes)];
+      const suggestedPosts = uniqueIndexes.map((i) => posts[i]);
+
+      return res.json({
+        success: true,
+        mes: "Gợi ý thành công",
+        suggestion,
+        ...(suggestedPosts.length > 0 && { suggestedPosts }), // chỉ thêm nếu có
+      });
+    } catch (error) {
+      console.error("🔥 AI Error:", error);
+      return res.status(500).json({
+        success: false,
+        mes: "Lỗi AI gợi ý bài đăng",
+        error: error.message,
+      });
+    }
+  }),
+
+
   createNewPost: asyncHandler(async (req, res) => {
     const { id } = req.user
     const { title, address, catalogId, description, images, rooms } = req.body
@@ -329,7 +420,7 @@ module.exports = {
       if (price.length === 1) filters["$rRooms.price$"] = { [Op.gte]: price[0] }
       else filters["$rRooms.price$"] = { [Op.between]: price }
     }
-    
+
     const prevPage = !page || page === 1 ? 0 : page - 1
     const offset = prevPage * limit
     if (offset) options.offset = offset

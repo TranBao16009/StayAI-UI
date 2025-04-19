@@ -19,7 +19,7 @@ import {
   ManagerCustomer,
   UpdatePost,
 } from "./pages/manager"
-import { AdminDashboard, AdminLayout, ManagerDashboard } from "./pages/admin"
+import { AdminDashboard, AdminLayout, ManagerDashboard, CreatePostAdmin, UpdatePostAdmin, CreateContractAdmin } from "./pages/admin"
 import ManageUser from "./pages/admin/ManageUser"
 import clsx from "clsx"
 
@@ -78,18 +78,18 @@ const App = () => {
           <Route path={pathname.user.MY_ROOM} element={<MyRoom />} />
         </Route>
 
-         {/* Admin Routes  */}
+        {/* Admin Routes */}
         <Route path={pathname.admin.LAYOUT} element={<AdminLayout />}>
           <Route path={pathname.admin.DASHBOARD} element={<AdminDashboard />} />
           <Route path={pathname.admin.MANAGE_DASHBOARD} element={<ManagerDashboard />} />
           <Route path={pathname.admin.MANAGE_USER} element={<ManageUser />} />
           <Route path={pathname.admin.MANAGE_CONTRACT} element={<ManageContract />} />
           <Route path={pathname.admin.MANAGE_ROOM} element={<ManageRoom />} />
-          <Route path={pathname.admin.CREATE_CONTRACT} element={<CreateContract />} />
+          <Route path={pathname.admin.CREATE_CONTRACT} element={<CreateContractAdmin />} />
           <Route path={pathname.admin.MANAGE_POST} element={<ManagePost />} />
           <Route path={pathname.admin.MANAGE_CUSTOMER} element={<ManagerCustomer />} />
-          <Route path={pathname.admin.UPDATE_POST__POSTID} element={<UpdatePost />} />
-          <Route path={pathname.admin.CREATE_POST} element={<CreatePost />} />
+          <Route path={pathname.admin.UPDATE_POST__POSTID} element={<UpdatePostAdmin />} />
+          <Route path={pathname.admin.CREATE_POST} element={<CreatePostAdmin />} />
         </Route>
       </Routes>
       <ToastContainer

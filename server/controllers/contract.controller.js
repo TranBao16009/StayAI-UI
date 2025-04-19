@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler")
 const db = require("../models")
+const { Sequelize, Op } = require("sequelize")
 
 module.exports = {
   create: asyncHandler(async (req, res) => {
@@ -32,82 +33,112 @@ module.exports = {
     })
   }),
   get: asyncHandler(async (req, res) => {
-    const { limit, page, sort, fields, keyword, postedBy, userId, ...filters } = req.query
-    const options = {}
-    if (postedBy) filters["$rRoom.rPost.postedBy$"] = postedBy
+    const { limit, page, sort, fields, keyword, postedBy, userId, ...filters } = req.query;
+    const options = {};
+    const contractWhere = { ...filters };
+
+    // Lọc theo người đăng bài
+    if (postedBy) contractWhere["$rRoom.rPost.postedBy$"] = postedBy;
+
+    // Xử lý fields
     if (fields) {
-      const attributes = fields.split(",")
-      const isExclude = attributes.some((el) => el.startsWith("-"))
-      if (isExclude)
-        options.attributes = {
-          exclude: attributes.map((el) => el.replace("-", "")),
-        }
-      else options.attributes = attributes
+      const attributes = fields.split(",");
+      const isExclude = attributes.some((el) => el.startsWith("-"));
+      options.attributes = isExclude
+        ? { exclude: attributes.map((el) => el.replace("-", "")) }
+        : attributes;
     }
-    if (keyword)
-      filters[Op.or] = [
+
+    // Tìm kiếm theo thông tin Room
+    const roomInclude = {
+      model: db.Room,
+      as: "rRoom",
+      attributes: ["id", "title", "position"],
+      include: [
         {
-          title: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("Post.title")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
+          model: db.Post,
+          as: "rPost",
+          attributes: ["id", "title", "postedBy"],
         },
-        {
-          address: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("Post.address")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-      ]
+      ],
+    };
+
+    if (keyword) {
+      roomInclude.where = {
+        [Op.or]: [
+          {
+            title: {
+              [Op.iLike]: `%${keyword}%`,
+            },
+          },
+          {
+            position: Sequelize.where(
+              Sequelize.cast(Sequelize.col("rRoom.position"), "TEXT"),
+              {
+                [Op.iLike]: `%${keyword}%`,
+              }
+            ),
+          },
+        ],
+      };
+    }
+
+    // Sắp xếp
     if (sort) {
       const order = sort
         .split(",")
-        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]))
-      options.order = order
+        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]));
+      options.order = order;
     }
 
+    // Nếu không phân trang
     if (!limit) {
       const response = await db.Contract.findAll({
-        where: filters,
+        where: contractWhere,
         subQuery: false,
-        // include: [
-        //   {
-        //     model: db.Post,
-        //     as: "rPost",
-        //     attributes: ["id", "postedBy", "title"],
-        //   },
-        // ],
+        include: [
+          roomInclude,
+          {
+            model: db.User,
+            as: "rUser",
+            attributes: ["id", "username", "phone"],
+            include: [
+              {
+                model: db.Profile,
+                as: "rprofile",
+                attributes: ["firstName", "lastName", "CID", "address", "birthday"],
+              },
+            ],
+          },
+          {
+            model: db.Payment,
+            as: "rPayments",
+            attributes: ["total"],
+            required: false,
+          },
+        ],
         ...options,
         distinct: true,
-      })
+      });
+
       return res.json({
         success: response.length > 0,
-        mes: response.length > 0 ? "Got." : "Có lỗi, hãy thử lại sau.",
+        mes: response.length > 0 ? "Got." : "Không tìm thấy hợp đồng.",
         contracts: response,
-      })
+      });
     }
-    const prevPage = !page || page === 1 ? 0 : page - 1
-    const offset = prevPage * limit
-    if (offset) options.offset = offset
-    options.limit = +limit
+
+    // Có phân trang
+    const prevPage = !page || page === 1 ? 0 : page - 1;
+    const offset = prevPage * limit;
+    if (offset) options.offset = offset;
+    options.limit = +limit;
+
     const response = await db.Contract.findAndCountAll({
-      where: filters,
+      where: contractWhere,
       subQuery: false,
       include: [
-        {
-          model: db.Room,
-          as: "rRoom",
-          attributes: ["id", "title", "position"],
-          include: [
-            {
-              model: db.Post,
-              as: "rPost",
-              attributes: ["id", "title", "postedBy"],
-            },
-          ],
-        },
+        roomInclude,
         {
           model: db.User,
           as: "rUser",
@@ -125,19 +156,19 @@ module.exports = {
           as: "rPayments",
           attributes: ["total"],
           required: false,
-
         },
       ],
       ...options,
       distinct: true,
     });
-    
+
     return res.json({
       success: Boolean(response),
       mes: response ? "Got." : "Có lỗi, hãy thử lại sau.",
       contracts: response,
-    })
+    });
   }),
+
   getCustomer: asyncHandler(async (req, res) => {
     const { limit, page, sort, fields, keyword, postedBy, ...filters } = req.query
     const options = {}
@@ -237,110 +268,151 @@ module.exports = {
     })
   }),
   getAdmin: asyncHandler(async (req, res) => {
-    const { limit, page, sort, fields, keyword, postedBy, userId, ...filters } = req.query
-    const options = {}
-    // if (postedBy) filters["$rRoom.rPost.postedBy$"] = postedBy
-    if (fields) {
-      const attributes = fields.split(",")
-      const isExclude = attributes.some((el) => el.startsWith("-"))
-      if (isExclude)
-        options.attributes = {
-          exclude: attributes.map((el) => el.replace("-", "")),
-        }
-      else options.attributes = attributes
-    }
-    if (keyword)
-      filters[Op.or] = [
-        {
-          title: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("Post.title")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-        {
-          address: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("Post.address")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-      ]
-    if (sort) {
-      const order = sort
-        .split(",")
-        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]))
-      options.order = order
-    }
+    try {
+      const { limit, page, sort, fields, keyword, postedBy, userId, ...filters } = req.query;
+      const options = {};
+      const contractWhere = { ...filters };
 
-    if (!limit) {
-      const response = await db.Contract.findAll({
-        where: filters,
+      // Xử lý chọn fields
+      if (fields) {
+        const attributes = fields.split(",");
+        const isExclude = attributes.some((el) => el.startsWith("-"));
+        if (isExclude) {
+          options.attributes = {
+            exclude: attributes.map((el) => el.replace("-", "")),
+          };
+        } else {
+          options.attributes = attributes;
+        }
+      }
+
+      // Xử lý tìm kiếm theo thông tin ROOM (không phải Post)
+      const roomInclude = {
+        model: db.Room,
+        as: "rRoom",
+        attributes: ["id", "title", "position"],
+        include: [
+          {
+            model: db.Post,
+            as: "rPost",
+            attributes: ["id", "title", "postedBy"],
+          },
+        ],
+      };
+
+      if (keyword) {
+        roomInclude.where = {
+          [Op.or]: [
+            {
+              title: {
+                [Op.iLike]: `%${keyword}%`,
+              },
+            },
+            {
+              position: Sequelize.where(
+                Sequelize.cast(Sequelize.col("rRoom.position"), "TEXT"),
+                {
+                  [Op.iLike]: `%${keyword}%`,
+                }
+              ),
+            },
+          ],
+        };
+      }
+
+      // Sắp xếp
+      if (sort) {
+        const order = sort
+          .split(",")
+          .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]));
+        options.order = order;
+      }
+
+      // Nếu không phân trang
+      if (!limit) {
+        const response = await db.Contract.findAll({
+          where: contractWhere,
+          subQuery: false,
+          include: [
+            roomInclude,
+            {
+              model: db.User,
+              as: "rUser",
+              attributes: ["id", "username", "phone"],
+              include: [
+                {
+                  model: db.Profile,
+                  as: "rprofile",
+                  attributes: ["firstName", "lastName", "CID", "address", "birthday"],
+                },
+              ],
+            },
+            {
+              model: db.Payment,
+              as: "rPayments",
+              attributes: ["total"],
+              required: false,
+            },
+          ],
+          ...options,
+          distinct: true,
+        });
+
+        return res.json({
+          success: response.length > 0,
+          mes: response.length > 0 ? "Got." : "Không tìm thấy hợp đồng.",
+          contracts: response,
+        });
+      }
+
+      // Có phân trang
+      const prevPage = !page || page === 1 ? 0 : page - 1;
+      const offset = prevPage * limit;
+      if (offset) options.offset = offset;
+      options.limit = +limit;
+
+      const response = await db.Contract.findAndCountAll({
+        where: contractWhere,
         subQuery: false,
-        // include: [
-        //   {
-        //     model: db.Post,
-        //     as: "rPost",
-        //     attributes: ["id", "postedBy", "title"],
-        //   },
-        // ],
+        include: [
+          roomInclude,
+          {
+            model: db.User,
+            as: "rUser",
+            attributes: ["id", "username", "phone"],
+            include: [
+              {
+                model: db.Profile,
+                as: "rprofile",
+                attributes: ["firstName", "lastName", "CID", "address", "birthday"],
+              },
+            ],
+          },
+          {
+            model: db.Payment,
+            as: "rPayments",
+            attributes: ["total"],
+            required: false,
+          },
+        ],
         ...options,
         distinct: true,
-      })
-      return res.json({
-        success: response.length > 0,
-        mes: response.length > 0 ? "Got." : "Có lỗi, hãy thử lại sau.",
-        contracts: response,
-      })
-    }
-    const prevPage = !page || page === 1 ? 0 : page - 1
-    const offset = prevPage * limit
-    if (offset) options.offset = offset
-    options.limit = +limit
-    const response = await db.Contract.findAndCountAll({
-      where: filters,
-      subQuery: false,
-      include: [
-        {
-          model: db.Room,
-          as: "rRoom",
-          attributes: ["id", "title", "position"],
-          include: [
-            {
-              model: db.Post,
-              as: "rPost",
-              attributes: ["id", "title", "postedBy"],
-            },
-          ],
-        },
-        {
-          model: db.User,
-          as: "rUser",
-          attributes: ["id", "username", "phone"],
-          include: [
-            {
-              model: db.Profile,
-              as: "rprofile",
-              attributes: ["firstName", "lastName", "CID", "address", "birthday"],
-            },
-          ],
-        },
-        {
-          model: db.Payment,
-          as: "rPayments",
-          attributes: ["total"],
-          required: false,
+      });
 
-        },
-      ],
-      ...options,
-      distinct: true,
-    });
-    
-    return res.json({
-      success: Boolean(response),
-      mes: response ? "Got." : "Có lỗi, hãy thử lại sau.",
-      contracts: response,
-    })
+      return res.json({
+        success: true,
+        mes: "Got.",
+        contracts: response,
+      });
+
+    } catch (error) {
+      console.error("getAdmin error:", error);
+      return res.status(500).json({
+        success: false,
+        mes: "Lỗi khi truy vấn danh sách hợp đồng.",
+        error: error.message,
+      });
+    }
   }),
+
 }

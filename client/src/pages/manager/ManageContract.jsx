@@ -2,10 +2,10 @@ import moment from "moment"
 import React, { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { RiDeleteBin6Line } from "react-icons/ri"
-import { Link, useSearchParams } from "react-router-dom"
+import { Link, useSearchParams, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
-import { apiGetContracts, apiRemoveContract,apiGetAdminContracts } from "~/apis/contract"
+import { apiGetContracts, apiRemoveContract, apiGetAdminContracts } from "~/apis/contract"
 import { InputForm, InputSelect } from "~/components/inputs"
 import { Pagiantion } from "~/components/paginations"
 import useDebounce from "~/hooks/useDebounce"
@@ -15,57 +15,62 @@ import pathname from "~/utilities/path"
 import clsx from "clsx"
 import { twMerge } from "tailwind-merge"
 import { FaEdit, FaRegEye } from "react-icons/fa"
-import ApproveContractDialog from '../../components/contract/ApproveContractDialog'; 
-import { useNavigate } from "react-router-dom"
+import ApproveContractDialog from '../../components/contract/ApproveContractDialog';
 
 const ManageContract = () => {
-  const {setContractData } = usePostStore()
-  const navigate = useNavigate()
+  const { setContractData } = usePostStore()
+  const { current } = useUserStore()
+  const isAdmin = current?.rroles?.some((el) => el.roleCode === "ADMIN")
+  const pathRole = isAdmin ? pathname.admin : pathname.manager
 
+  const navigate = useNavigate()
   const {
     register,
     formState: { errors },
     watch,
   } = useForm()
+
   const sort = watch("sort")
   const keyword = watch("keyword")
-  const { current } = useUserStore()
   const [contracts, setContracts] = useState()
   const [update, setUpdate] = useState(false)
   const [searchParams] = useSearchParams()
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedContract, setSelectedContract] = useState(null);
+  const [showDialog, setShowDialog] = useState(false)
+  const [selectedContract, setSelectedContract] = useState(null)
 
-  const openDialog = (contact) => {
-    setSelectedContract(contact);
-    setShowDialog(true);
-  };
+  const openDialog = (contract) => {
+    setSelectedContract(contract)
+    setShowDialog(true)
+  }
 
   const fetchContracts = async (params) => {
-    let response;
+    let response
 
-    if (current.rroles.some((el) => el.roleCode === "ADMIN")) {
-        response = await apiGetAdminContracts({
-          limit: import.meta.env.VITE_LIMIT_CONTRACTS,
-          postedBy: current?.id,
-          ...params,
-        });
+    if (isAdmin) {
+      response = await apiGetAdminContracts({
+        limit: import.meta.env.VITE_LIMIT_CONTRACTS,
+        postedBy: current?.id,
+        ...params,
+      })
     } else {
-        response = await apiGetContracts({
-          limit: import.meta.env.VITE_LIMIT_CONTRACTS,
-          postedBy: current?.id,
-          ...params,
-        });
+      response = await apiGetContracts({
+        limit: import.meta.env.VITE_LIMIT_CONTRACTS,
+        postedBy: current?.id,
+        ...params,
+      })
     }
     if (response.success) setContracts(response.contracts)
   }
+
   const debounceKeyword = useDebounce(keyword, 800)
+
   useEffect(() => {
     const params = Object.fromEntries([...searchParams])
     if (sort) params.sort = sort
     if (debounceKeyword) params.keyword = debounceKeyword
     fetchContracts(params)
   }, [update, debounceKeyword, searchParams])
+
   const handleDeleteContract = (id) => {
     Swal.fire({
       title: "Xác nhận",
@@ -92,31 +97,32 @@ const ManageContract = () => {
       bName: contract?.rUser?.rprofile?.lastName + " " + contract?.rUser?.rprofile?.firstName,
       bcccd: contract?.rUser?.rprofile?.CID || "",
       bcccddate: "....................",
-      bcccdaddress:"...................",
+      bcccdaddress: "...................",
       bAddress: contract?.rUser?.rprofile?.address || "",
       bBirthday: moment(contract?.rUser?.rprofile?.birthday).format("YYYY-MM-DD") || "",
       houseaddress: contract?.rRoom?.title,
       price: formatMoney(contract?.rPayments[0]?.total),
       start: moment(contract?.createAt).format("YYYY-MM-DD"),
-      end:moment(contract?.createdAt).format("YYYY-MM-DD"),
-      currentday:moment(contract?.createdAt).date().toString().padStart(2, '0'),
-      currentmonth: (moment(contract?.createdAt).month()+1).toString().padStart(2, '0'),
+      end: moment(contract?.createdAt).format("YYYY-MM-DD"),
+      currentday: moment(contract?.createdAt).date().toString().padStart(2, '0'),
+      currentmonth: (moment(contract?.createdAt).month() + 1).toString().padStart(2, '0'),
       currentyear: moment(contract?.createdAt).year().toString(),
-    };
-    setContractData(data);
+    }
+    setContractData(data)
     navigate(`/${pathname.user.CONTRACT}`)
   }
+
   return (
-    <div className="w-full h-hull">
+    <div className="w-full h-full">
       <div className="py-4 lg:border-b flex items-center justify-between flex-wrap gap-4 px-4 w-full">
         <h1 className="text-3xl font-bold">Quản lý hợp đồng</h1>
         <div className="flex gap-4 items-center">
           <Link
-              className="text-white bg-[#007370] px-4 py-2 rounded-md flex justify-center items-center"
-              to={`/${pathname.manager.LAYOUT}/${pathname.manager.CREATE_CONTRACT}`}
-            >
-              Tạo mới
-            </Link>
+            className="text-white bg-[#007370] px-4 py-2 rounded-md flex justify-center items-center"
+            to={`/${pathRole.LAYOUT}/${pathRole.CREATE_CONTRACT}`}
+          >
+            Tạo mới
+          </Link>
         </div>
       </div>
       <div className="p-4">
@@ -167,7 +173,7 @@ const ManageContract = () => {
               <th className="border hidden lg:table-cell p-3 text-center">Số người ở</th>
               <th className="border hidden lg:table-cell p-3 text-center">Ghi chú</th>
               <th className="border p-3 text-center">Trạng thái</th>
-              <th className="border  p-3 text-white bg-[#007370] text-center">Thao tác</th>
+              <th className="border p-3 text-white bg-[#007370] text-center">Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -184,53 +190,46 @@ const ManageContract = () => {
                 <td className="border hidden lg:table-cell p-3 text-center">
                   <span className="line-clamp-2">{el.notes}</span>
                 </td>
-                <td
-                  className={twMerge(
-                    clsx("border p-3 text-center", el.rRoom?.position === "Đang xử lý" && "text-orange-600")
-                  )}
-                >
+                <td className={twMerge(clsx("border p-3 text-center", el.rRoom?.position === "Đang xử lý" && "text-orange-600"))}>
                   {el.rRoom?.position}
                 </td>
                 <td className="border p-3 text-center">
-                <span className="flex items-center text-gray-500 gap-4 justify-center">
-                  {el.rRoom?.position === "Đang xử lý" && (
-                  <span
-                    key={el.id}
-                    title="Cập nhật trạng thái"
-                    className="cursor-pointer hover:text-[#007370]"
-                    onClick={() => openDialog(el)}
-                  >
-                    <FaEdit size={18} />
-                  </span>
-                )}
-
-                <span
-                  title="Xem hợp đồng"
-                  onClick={() => handleViewContract(el)}
-                  className="text-[#007370] hover:underline cursor-pointer text-center"
-                >
-                  <FaRegEye size={18} />
-                </span>
-
-                <span
-                  title="Xóa"
-                  className="cursor-pointer hover:text-[#007370]"
-                  onClick={() => handleDeleteContract(el.id)}
-                >
-                  <RiDeleteBin6Line size={18} />
-                </span>
+                  <span className="flex items-center text-gray-500 gap-4 justify-center">
+                    {el.rRoom?.position === "Đang xử lý" && (
+                      <span
+                        key={el.id}
+                        title="Cập nhật trạng thái"
+                        className="cursor-pointer hover:text-[#007370]"
+                        onClick={() => openDialog(el)}
+                      >
+                        <FaEdit size={18} />
+                      </span>
+                    )}
+                    <span
+                      title="Xem hợp đồng"
+                      onClick={() => handleViewContract(el)}
+                      className="text-[#007370] hover:underline cursor-pointer text-center"
+                    >
+                      <FaRegEye size={18} />
+                    </span>
+                    <span
+                      title="Xóa"
+                      className="cursor-pointer hover:text-[#007370]"
+                      onClick={() => handleDeleteContract(el.id)}
+                    >
+                      <RiDeleteBin6Line size={18} />
+                    </span>
                     {showDialog && selectedContract && (
                       <ApproveContractDialog
                         contract={selectedContract}
                         onClose={() => {
-                          setShowDialog(false);
-                          setSelectedContract(null);
+                          setShowDialog(false)
+                          setSelectedContract(null)
                         }}
                         onApprove={fetchContracts}
                       />
                     )}
                   </span>
-
                 </td>
               </tr>
             ))}

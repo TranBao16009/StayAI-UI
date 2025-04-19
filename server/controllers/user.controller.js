@@ -124,92 +124,108 @@ module.exports = {
     })
   }),
   getUsers: asyncHandler(async (req, res) => {
-    const { limit, page, sort, fields, title, keyword, ...filters } = req.query
-    const options = {}
-    if (fields) {
-      const attributes = fields.split(",")
-      const isExclude = attributes.some((el) => el.startsWith("-"))
-      if (isExclude)
-        options.attributes = {
-          exclude: attributes.map((el) => el.replace("-", "")),
-        }
-      else options.attributes = attributes
-    }
-    if (keyword)
-      filters[Op.or] = [
-        {
-          title: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("User.username")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-        {
-          firstName: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rprofile.firstName")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-        {
-          lastName: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rprofile.lastName")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-      ]
-    if (sort) {
-      const order = sort
-        .split(",")
-        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]))
-      options.order = order
-    }
+    try {
+      const { limit, page, sort, fields, keyword, ...filters } = req.query;
+      const options = {};
+      const userWhere = { ...filters };
 
-    if (!limit) {
-      const response = await db.User.findAll({
-        where: filters,
-        ...options,
-        attributes: ["id", "phone", "username"],
-        include: [
+      // Xử lý chọn fields
+      if (fields) {
+        const attributes = fields.split(",");
+        const isExclude = attributes.some((el) => el.startsWith("-"));
+        options.attributes = isExclude
+          ? { exclude: attributes.map((el) => el.replace("-", "")) }
+          : attributes;
+      }
+
+      // Tìm kiếm keyword chỉ trong bảng User
+      if (keyword) {
+        userWhere[Op.or] = [
           {
-            model: db.Profile,
-            as: "rprofile",
+            username: {
+              [Op.iLike]: `%${keyword}%`,
+            },
           },
-        ],
-      })
-      return res.json({
-        success: response.length > 0,
-        mes: response.length > 0 ? "Got." : "Có lỗi, hãy thử lại sau.",
-        users: response,
-      })
-    }
-    const prevPage = !page || page === 1 ? 0 : page - 1
-    const offset = prevPage * limit
-    if (offset) options.offset = offset
-    options.limit = +limit
-    const response = await db.User.findAndCountAll({
-      where: filters,
-      attributes: { exclude: ["password"] },
-      ...options,
-      distinct: true,
-      include: [
-        { model: db.Profile, as: "rprofile" },
+          {
+            phone: {
+              [Op.iLike]: `%${keyword}%`,
+            },
+          },
+        ];
+      }
+
+      // Sắp xếp
+      if (sort) {
+        const order = sort
+          .split(",")
+          .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]));
+        options.order = order;
+      }
+
+      const includeOptions = [
+        {
+          model: db.Profile,
+          as: "rprofile",
+        },
         {
           model: db.Role_User,
           as: "rroles",
           attributes: ["roleCode"],
-          include: [{ model: db.Role, as: "roleValues", attributes: ["value"] }],
+          include: [
+            {
+              model: db.Role,
+              as: "roleValues",
+              attributes: ["value"],
+            },
+          ],
         },
-      ],
-    })
+      ];
 
-    return res.json({
-      success: Boolean(response),
-      mes: response ? "Got." : "Có lỗi, hãy thử lại sau.",
-      users: response,
-    })
+      // Nếu không phân trang
+      if (!limit) {
+        const response = await db.User.findAll({
+          where: userWhere,
+          ...options,
+          attributes: ["id", "phone", "username"],
+          include: includeOptions,
+        });
+
+        return res.json({
+          success: response.length > 0,
+          mes: response.length > 0 ? "Got." : "Không tìm thấy người dùng.",
+          users: response,
+        });
+      }
+
+      // Có phân trang
+      const prevPage = !page || page === 1 ? 0 : page - 1;
+      const offset = prevPage * limit;
+      if (offset) options.offset = offset;
+      options.limit = +limit;
+
+      const response = await db.User.findAndCountAll({
+        where: userWhere,
+        attributes: { exclude: ["password"] },
+        ...options,
+        distinct: true,
+        include: includeOptions,
+      });
+
+      return res.json({
+        success: true,
+        mes: "Got.",
+        users: response,
+      });
+    } catch (error) {
+      console.error("getUsers error:", error);
+      return res.status(500).json({
+        success: false,
+        mes: "Đã xảy ra lỗi khi truy vấn danh sách người dùng.",
+        error: error.message,
+      });
+    }
   }),
+
   updateManager: asyncHandler(async (req, res) => {
     const { id } = req.user
     const response = await db.Role_User.create({
@@ -535,17 +551,17 @@ module.exports = {
           model: db.Contract,
           as: "rContracts",
           include: [
-            { 
-              model: db.Room, 
-              as: "rRoom", 
+            {
+              model: db.Room,
+              as: "rRoom",
               required: false, // Đảm bảo kết quả vẫn trả về nếu không có Room
               include: [
-                { 
-                  model: db.Post, 
-                  as: "rPost", 
+                {
+                  model: db.Post,
+                  as: "rPost",
                   required: false // Đảm bảo kết quả vẫn trả về nếu không có Post
                 }
-              ] 
+              ]
             }
           ],
         },
@@ -557,7 +573,7 @@ module.exports = {
         },
       ],
     });
-      
+
 
     return res.json({
       success: Boolean(response),
@@ -566,103 +582,109 @@ module.exports = {
     })
   }),
   getUsersbyManager: asyncHandler(async (req, res) => {
-    const { limit, page, sort, fields, title, keyword, ...filters } = req.query;
-    const options = {};
-    
-    if (fields) {
-      const attributes = fields.split(",");
-      const isExclude = attributes.some((el) => el.startsWith("-"));
-      if (isExclude)
-        options.attributes = {
-          exclude: attributes.map((el) => el.replace("-", "")),
-        };
-      else options.attributes = attributes;
-    }
-    
-    if (keyword)
-      filters[Op.or] = [
+    try {
+      const { limit, page, sort, fields, keyword, ...filters } = req.query;
+      const options = {};
+      const userWhere = { ...filters };
+
+      // Xử lý chọn trường (fields)
+      if (fields) {
+        const attributes = fields.split(",");
+        const isExclude = attributes.some((el) => el.startsWith("-"));
+        options.attributes = isExclude
+          ? { exclude: attributes.map((el) => el.replace("-", "")) }
+          : attributes;
+      }
+
+      // Tìm kiếm keyword chỉ trong bảng User
+      if (keyword) {
+        userWhere[Op.or] = [
+          {
+            username: {
+              [Op.iLike]: `%${keyword}%`,
+            },
+          },
+          {
+            phone: {
+              [Op.iLike]: `%${keyword}%`,
+            },
+          },
+        ];
+      }
+
+      // Sắp xếp nếu có
+      if (sort) {
+        const order = sort
+          .split(",")
+          .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]));
+        options.order = order;
+      }
+
+      // Include các bảng liên quan (không dùng where trong rprofile nữa)
+      const includeOptions = [
         {
-          title: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("User.username")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
+          model: db.Profile,
+          as: "rprofile",
         },
         {
-          firstName: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rprofile.firstName")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
-        },
-        {
-          lastName: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("rprofile.lastName")),
-            "LIKE",
-            `%${keyword.toLocaleLowerCase()}%`
-          ),
+          model: db.Role_User,
+          as: "rroles",
+          where: { roleCode: "MANAGER" },
+          include: [
+            {
+              model: db.Role,
+              as: "roleValues",
+              attributes: ["value"],
+            },
+          ],
         },
       ];
-  
-    if (sort) {
-      const order = sort
-        .split(",")
-        .map((el) => (el.startsWith("-") ? [el.replace("-", ""), "DESC"] : [el, "ASC"]));
-      options.order = order;
-    }
-  
-    const includeOptions = [
-      {
-        model: db.Profile,
-        as: "rprofile",
-      },
-      {
-        model: db.Role_User,
-        as: "rroles",
-        where: { roleCode: 'MANAGER' }, // Điều kiện lọc vai trò MANAGER
-        include: [
-          {
-            model: db.Role,
-            as: "roleValues",
-            attributes: ["value"],
-          },
-        ],
-      },
-    ];
-  
-    // Nếu không có giới hạn
-    if (!limit) {
-      const response = await db.User.findAll({
-        where: filters,
+
+      // Không phân trang
+      if (!limit) {
+        const response = await db.User.findAll({
+          where: userWhere,
+          ...options,
+          attributes: ["id", "phone", "username"],
+          include: includeOptions,
+        });
+
+        return res.json({
+          success: response.length > 0,
+          mes: response.length > 0 ? "Got." : "Không tìm thấy người dùng.",
+          users: response,
+        });
+      }
+
+      // Có phân trang
+      const prevPage = !page || page === 1 ? 0 : page - 1;
+      const offset = prevPage * limit;
+      if (offset) options.offset = offset;
+      options.limit = +limit;
+
+      const response = await db.User.findAndCountAll({
+        where: userWhere,
+        attributes: { exclude: ["password"] },
         ...options,
-        attributes: ["id", "phone", "username"],
+        distinct: true,
         include: includeOptions,
       });
+
       return res.json({
-        success: response.length > 0,
-        mes: response.length > 0 ? "Got." : "Có lỗi, hãy thử lại sau.",
+        success: true,
+        mes: "Got.",
         users: response,
       });
+
+    } catch (error) {
+      console.error("getUsersbyManager error:", error);
+      return res.status(500).json({
+        success: false,
+        mes: "Lỗi khi truy vấn danh sách người dùng.",
+        error: error.message,
+      });
     }
-    
-    const prevPage = !page || page === 1 ? 0 : page - 1;
-    const offset = prevPage * limit;
-    if (offset) options.offset = offset;
-    options.limit = +limit;
-  
-    const response = await db.User.findAndCountAll({
-      where: filters,
-      attributes: { exclude: ["password"] },
-      ...options,
-      distinct: true,
-      include: includeOptions,
-    });
-  
-    return res.json({
-      success: Boolean(response),
-      mes: response ? "Got." : "Có lỗi, hãy thử lại sau.",
-      users: response,
-    });
   }),
-  
+
+
 }

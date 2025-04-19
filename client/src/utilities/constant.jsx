@@ -54,7 +54,7 @@ export const userSidebar = [
   },
   {
     id: 999,
-    name: "Trang chủ",
+    name: "Homepage",
     path: `/`,
     icon: <IoHomeOutline size={20} />,
   },
@@ -92,7 +92,7 @@ export const managerSidebar = [
   },
   {
     id: 999,
-    name: "Trang chủ",
+    name: "Homepage",
     path: `/`,
     icon: <IoHomeOutline size={20} />,
   },
@@ -142,7 +142,7 @@ export const adminSidebar = [
   },
   {
     id: 999,
-    name: "Trang chủ",
+    name: "Homepage",
     path: `/`,
     icon: <IoHomeOutline size={20} />,
   },

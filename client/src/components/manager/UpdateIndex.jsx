@@ -31,6 +31,9 @@ const UpdateIndex = ({ room }) => {
       <h1 className="text-2xl font-semibold p-4 border-b">
         Cập nhật chỉ số phòng <span className="text-[#007370]">{room?.title}</span>
       </h1>
+      <p className="px-4 pb-2 mt-4 text-gray-600">
+        Tiền phòng: <span className="font-semibold text-[#007370]">{room?.price?.toLocaleString()} VND</span>
+      </p>
       <form className="p-4 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputForm
           id="date"

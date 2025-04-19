@@ -16,6 +16,9 @@ import Swal from "sweetalert2"
 
 const ManagePost = () => {
   const { current } = useUserStore()
+  const isAdmin = current?.rroles?.some((el) => el.roleCode === "ADMIN")
+  const pathRole = isAdmin ? pathname.admin : pathname.manager
+
   const [searchParams] = useSearchParams()
   const {
     register,
@@ -24,37 +27,39 @@ const ManagePost = () => {
   } = useForm()
   const sort = watch("sort")
   const keyword = watch("keyword")
-  const { setModal, isShowModal } = useAppStore()
+  const { isShowModal } = useAppStore()
   const navigate = useNavigate()
   const [update, setUpdate] = useState(false)
   const [posts, setPosts] = useState()
-  const fetchPosts = async (params) => {
-    let response;
 
-    if (current.rroles.some((el) => el.roleCode === "ADMIN")) {
-        response = await apiGetAdminPosts({
-            limit: import.meta.env.VITE_LIMIT_POSTS,
-            ...params,
-        });
+  const fetchPosts = async (params) => {
+    let response
+    if (isAdmin) {
+      response = await apiGetAdminPosts({
+        limit: import.meta.env.VITE_LIMIT_POSTS,
+        ...params,
+      })
     } else {
-        response = await apiGetPosts({
-            limit: import.meta.env.VITE_LIMIT_POSTS,
-            postedBy: current?.id,
-            ...params,
-        });
+      response = await apiGetPosts({
+        limit: import.meta.env.VITE_LIMIT_POSTS,
+        postedBy: current?.id,
+        ...params,
+      })
     }
     if (response.success) {
-        setPosts(response.posts);
+      setPosts(response.posts)
     }
-};
+  }
 
   const debounceKeyword = useDebounce(keyword, 800)
+
   useEffect(() => {
     const params = Object.fromEntries([...searchParams])
     if (sort) params.sort = sort
     if (debounceKeyword) params.keyword = debounceKeyword
     !isShowModal && fetchPosts(params)
   }, [isShowModal, searchParams, sort, debounceKeyword, update])
+
   const handleRemove = (id) => {
     Swal.fire({
       icon: "warning",
@@ -74,16 +79,17 @@ const ManagePost = () => {
       }
     })
   }
+
   return (
     <div className="w-full h-full">
       <div className="flex justify-between py-4 lg:border-b px-4 items-center">
         <h1 className="text-3xl font-bold">Quản lý tin đăng</h1>
-          <Link
-            to={`/${pathname.manager.LAYOUT}/${pathname.manager.CREATE_POST}`}
-            className="py-2 px-4 bg-[#007370] text-white flex justify-center items-center rounded-md"
-          >
-            Tạo mới
-          </Link>
+        <Link
+          to={`/${pathRole.LAYOUT}/${pathRole.CREATE_POST}`}
+          className="py-2 px-4 bg-[#007370] text-white flex justify-center items-center rounded-md"
+        >
+          Tạo mới
+        </Link>
       </div>
       <div className="p-4">
         <p className="p-3 text-sm text-center italic rounded-md border border-[#007370] bg-blue-100 text-[#007370]">
@@ -149,20 +155,22 @@ const ManagePost = () => {
                   <td className="border p-3 text-center">{el.star}</td>
                   <td className="border p-3 text-center">{moment(el.updatedAt).format("DD/MM/YY")}</td>
                   <td className="border p-3 text-center">
-                  <span className="flex items-center gap-4 justify-center">
-                    <span
-                      onClick={() => navigate(`/${pathname.manager.LAYOUT}/${pathname.manager.UPDATE_POST}/${el.id}`)}
-                      className="cursor-pointer hover:text-[#007370]"
-                    >
-                      <FiEdit size={18} />
+                    <span className="flex items-center gap-4 justify-center">
+                      <span
+                        onClick={() =>
+                          navigate(`/${pathRole.LAYOUT}/${pathRole.UPDATE_POST}/${el.id}`)
+                        }
+                        className="cursor-pointer hover:text-[#007370]"
+                      >
+                        <FiEdit size={18} />
+                      </span>
+                      <span
+                        onClick={() => handleRemove(el.id)}
+                        className="cursor-pointer hover:text-[#007370]"
+                      >
+                        <RiDeleteBin6Line size={18} />
+                      </span>
                     </span>
-                    <span
-                      onClick={() => handleRemove(el.id)}
-                      className="cursor-pointer hover:text-[#007370]"
-                    >
-                      <RiDeleteBin6Line size={18} />
-                    </span>
-                  </span>
                   </td>
                 </tr>
               ))}

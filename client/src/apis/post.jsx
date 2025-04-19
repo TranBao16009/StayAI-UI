@@ -13,11 +13,11 @@ export const apiGetPosts = (params) =>
     params,
   })
 export const apiGetAdminPosts = (params) =>
-    axios({
-      url: "/post/admin/",
-      method: "get",
-      params,
-    })
+  axios({
+    url: "/post/admin/",
+    method: "get",
+    params,
+  })
 export const apiGetPostById = (id) =>
   axios({
     url: "/post/" + id,
@@ -40,3 +40,9 @@ export const apiRatings = (id, data) =>
     method: "post",
     data,
   })
+export const apiSuggestPost = (data) =>
+  axios({
+    url: "/post/suggested",
+    method: "post",
+    data,
+  });
